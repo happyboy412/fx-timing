@@ -13,14 +13,11 @@ PLAF 데모데이 프로젝트. 일본 매장에서 가격표만 넣으면 한�
 - Actions 탭 → "엔화 환율 알림" → "Run workflow"로 바로 시험해 볼 수 있어요.
 - 목표 이하가 되면 저장소에 이슈가 열리고, GitHub가 저장소 주인에게 이메일을 보내요. 이 알림은 저장소 주인(나)만 받아요. 모든 사용자에게 보내려면 로그인과 서버가 필요해요.
 
-## 국내 최저가 자동 검색 켜기 (선택)
-상품 이름을 넣으면 네이버 쇼핑 최저가 후보를 보여 주고, 고르면 한국 가격이 채워져요. API 키를 숨기려고 Cloudflare Worker를 하나 거쳐요 (무료).
-1. developers.naver.com → 애플리케이션 등록 → 사용 API에서 **검색**을 고르고, 서비스 URL에 `https://happyboy412.github.io`를 넣어요. Client ID와 Client Secret이 나와요.
-2. dash.cloudflare.com → Workers & Pages → Create → Worker를 만들고, `worker/naver-shop.js` 내용을 붙여 넣어 Deploy해요.
-3. 그 Worker의 Settings → Variables and Secrets에서 `NAVER_ID`, `NAVER_SECRET`을 **Secret**으로 넣어요. 키는 여기에만 두고 다른 곳(채팅, 저장소)에 올리지 마세요.
-4. Worker 주소(`https://이름.아이디.workers.dev`)를 `index.html`의 `const KR_API = "";` 안에 넣고 저장해요.
-- 끄려면 `KR_API`를 다시 비우면 돼요. 비어 있으면 "국내 최저가 찾기" 버튼이 네이버 쇼핑 검색 페이지를 열어요.
-- 검색 결과는 비슷한 다른 모델이 섞일 수 있어서, 사용자가 직접 골라야 가격이 들어가요.
+## 국내 판매가 확인
+- 계산기의 "네이버 쇼핑 ↗ / 쿠팡 ↗" 버튼이 입력한 상품 이름으로 검색 페이지를 열어요. 본 가격을 한국 가격 칸에 넣으면 판정돼요.
+- 한국 가격을 모르면 "한국에서 ○○원보다 비싸면 일본이 이득"이라는 손익분기 금액으로 판정해요.
+- 자동 조회는 쓰지 않아요. 네이버 쇼핑 검색 API는 2026년 7월 31일 종료됐어요.
+- 확장 계획: 쿠팡 파트너스 최종 승인(누적 판매 15만 원 이상) 뒤 상품 검색 API를 Cloudflare Worker로 감싸 `index.html`의 `const KR_API = "";`에 주소를 넣으면 "국내가 자동 찾기" 버튼이 켜져요. Worker는 `{items:[{title, price, mall, source, category}]}` 형식으로 응답하면 되고, API 키는 Worker의 Secret에만 둬요. 쿠팡 링크로 수수료를 받게 되면 앱에 제휴 고지 문구도 넣어야 해요.
 
 ## 이용 통계 켜기 (선택)
 1. goatcounter.com에서 무료 계정을 만들어요 (쿠키·개인정보 없이 집계).

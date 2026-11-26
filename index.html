@@ -180,7 +180,7 @@ html:not([data-theme="retro"]) .more>.stack{padding:0 16px 16px}
 html:not([data-theme="retro"]) .more summary .small{flex:1;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
 html:not([data-theme="retro"]) .paths{display:flex;flex-direction:column;gap:10px}
 html:not([data-theme="retro"]) .paths>b{font-size:15px}
-html:not([data-theme="retro"]) .path-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+html:not([data-theme="retro"]) .path-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}html:not([data-theme="retro"]) .path-btns>:first-child{grid-column:1/-1}
 html:not([data-theme="retro"]) .path-btn{display:flex;flex-direction:column;gap:2px;text-align:left;padding:14px 16px;border:1px solid var(--grey-200);border-radius:var(--r-lg);background:#fff;color:var(--grey-900);font:inherit;text-decoration:none;cursor:pointer}
 html:not([data-theme="retro"]) .path-btn .t{font-weight:600;font-size:15px}
 html:not([data-theme="retro"]) .path-btn .s{font-size:13px;color:var(--grey-600)}
@@ -410,7 +410,7 @@ html[data-theme="retro"] .verdict.is-good{background:linear-gradient(135deg,#E7F
 html[data-theme="retro"] .verdict.is-bad{background:linear-gradient(135deg,#FFEFF1,#FFF6F7);color:var(--bad)}
 html[data-theme="retro"] .verdict.is-even{background:var(--even-bg);color:var(--even)}
 html[data-theme="retro"] .paths{background:var(--field);border-radius:var(--r-lg);padding:14px}
-html[data-theme="retro"] .path-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+html[data-theme="retro"] .path-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}html[data-theme="retro"] .path-btns>:first-child{grid-column:1/-1}
 html[data-theme="retro"] .path-btn{display:flex;flex-direction:column;gap:2px;text-align:left;padding:14px;border:0;border-radius:var(--r-md);background:#fff;color:var(--ink);font:inherit;text-decoration:none;box-shadow:0 1px 3px rgba(22,22,29,.06);cursor:pointer}
 html[data-theme="retro"] .path-btn .t{font-weight:700;font-size:14.5px}
 html[data-theme="retro"] .path-btn .s{font-size:12px;color:var(--muted)}
@@ -887,7 +887,7 @@ html[data-theme="retro"] .cardtable{border:2px solid var(--line);border-radius:0
             <label class="field">한국 가격 (원) <span class="hint" id="c-kr-src"></span>
               <input id="c-kr" type="number" min="0" max="100000000" step="1000" inputmode="numeric" value="619000" placeholder="국내 판매가">
             </label>
-            <div class="span2 kr-tools"><button class="btn btn-sm btn-ghost" type="button" id="c-krfind">국내 최저가 찾기</button><span class="muted tiny" id="c-krstate"></span></div>
+            <div class="span2 kr-tools"><span class="muted tiny">국내가 확인</span><a class="btn btn-sm btn-ghost" id="c-kr-naver" target="_blank" rel="noopener" data-track="kr-naver" href="https://search.shopping.naver.com/">네이버 쇼핑 ↗</a><a class="btn btn-sm btn-ghost" id="c-kr-coupang" target="_blank" rel="noopener" data-track="kr-coupang" href="https://www.coupang.com/">쿠팡 ↗</a><button class="btn btn-sm btn-ghost" type="button" id="c-krfind" hidden>국내가 자동 찾기</button><span class="muted tiny" id="c-krstate"></span></div>
             <div class="span2 krlist" id="c-krlist" hidden></div>
           </div>
           <p class="note note-warn" id="c-suggest" hidden></p>
@@ -926,7 +926,7 @@ html[data-theme="retro"] .cardtable{border:2px solid var(--line);border-radius:0
           <div class="paths stack">
             <b class="small">어디서 사든 바로 이어서</b>
             <div class="path-btns" id="c-paths"></div>
-            <p class="muted tiny">판정과 상관없이 두 경로를 같이 보여줘요.</p>
+            <p class="muted tiny">판정과 상관없이 일본·한국 경로를 같이 보여줘요.</p>
           </div>
           <button class="btn btn-primary" type="button" id="c-add">리스트에 담기</button>
           <p class="muted small" id="c-msg" aria-live="polite"></p>
@@ -1352,6 +1352,7 @@ const curPerson = () => clamp(S.person, 1, S.people);
 function toast(msg){ const t=$("toast"); t.textContent = msg; t.classList.add("is-on"); clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.classList.remove("is-on"), 2800); }
 function pulse(){ const m=$("minibar"); m.classList.remove("is-pulse"); void m.offsetWidth; m.classList.add("is-pulse"); }
 const naverURL = q => "https://search.shopping.naver.com/search/all?query=" + encodeURIComponent(q);
+const coupangURL = q => "https://www.coupang.com/np/search?q=" + encodeURIComponent(q);
 const signed = n => (n>=0 ? "+" : "−") + gap(n);
 
 function renderTrip(){
@@ -1497,7 +1498,7 @@ function renderCalc(){
   const oth = Math.abs(e.others) >= 1 ? `<br>같이 사면 같은 매장 물건도 환급 조건(세전 ¥5,000)을 채워 ${won(-e.others)} 더 돌려받아요.` : "";
   const it = matchId ? ITEMS.find(i=>i.id===matchId) : null;
   const spec = (it && it.spec ? `<div class="spec">⚠ 사양 차이 있음 · ${esc(it.spec)}</div>` : "")
-    + (it && /직구/.test(it.krSrc) && !krTouched && v.cls !== "is-check" ? `<div class="spec">⚠ 국내가가 직구 판매가라 실제 국내 최저가는 더 낮을 수 있어요. "국내 최저가 찾기"로 확인해 보세요.</div>` : "");
+    + (it && /직구/.test(it.krSrc) && !krTouched && v.cls !== "is-check" ? `<div class="spec">⚠ 국내가가 직구 판매가라 실제 국내 최저가는 더 낮을 수 있어요. 네이버 쇼핑·쿠팡에서 확인해 보세요.</div>` : "");
   const box = $("c-verdict"); box.className = "verdict " + v.cls;
   setHTML("c-verdict", `<div class="v">${esc(v.text)}</div><p class="d"><b>${esc(v.why)}</b><br>${tax}<br>국내 기준가 <b>${e.kr ? won(e.kr) : "미입력"}</b>${c.yen>0 && !e.sepOver ? ` · 손익분기 국내가 <b>${won(e.beat)}</b>` : ""}${oth}${wl}</p>${spec}`);
 
@@ -1527,6 +1528,8 @@ function renderCalc(){
   $("c-wallet").checked = S.useWallet && !!wr;
   setText("c-wallet-info", wr ? `(100엔 ${wr.toFixed(1)}원 · 리스트 결제 후 남은 엔화 ¥${fmt(Math.max(0, S.wallet.yen - cartEntries().reduce((a,x)=>a+paidYen(x.it)*x.q,0)))})` : "(출국 전 탭에서 환전 기록을 넣으면 켤 수 있어요)");
   $("c-naver").href = naverURL(c.name);
+  $("c-kr-naver").href = naverURL(c.name || "");
+  $("c-kr-coupang").href = coupangURL(c.name || "");
 
   const pk = [c.store, v.cls, c.name].join("|");
   if (pk !== pathsKey){
@@ -1535,7 +1538,8 @@ function renderCalc(){
     const jp = st.link
       ? `<a class="path-btn${jpRec}" href="${st.link}" target="_blank" rel="noopener"><span class="t">${st.l} 쿠폰 받기 ↗</span><span class="s">일본에서 사기${jpRec?" · 유리":""}</span></a>`
       : `<button class="path-btn${jpRec}" type="button" aria-disabled="true" data-act="nolink"><span class="t">${st.l}</span><span class="s">일본에서 사기 · 연결할 쿠폰 페이지 없음</span></button>`;
-    const kr = `<a class="path-btn${krRec}" href="${naverURL(c.name)}" target="_blank" rel="noopener"><span class="t">국내 판매가 보기 ↗</span><span class="s">한국에서 사기 · 네이버 쇼핑${krRec?" · 유리":""}</span></a>`;
+    const kr = `<a class="path-btn${krRec}" href="${naverURL(c.name)}" target="_blank" rel="noopener"><span class="t">네이버 쇼핑 ↗</span><span class="s">한국에서 사기${krRec?" · 유리":""}</span></a>`
+      + `<a class="path-btn${krRec}" href="${coupangURL(c.name)}" target="_blank" rel="noopener"><span class="t">쿠팡 ↗</span><span class="s">한국에서 사기${krRec?" · 유리":""}</span></a>`;
     $("c-paths").innerHTML = jp + kr;
   }
 }
@@ -1777,27 +1781,29 @@ function loadSample(){
   toast("예시 상품 2개를 담았어요. 지우려면 ×를 누르세요."); renderAll();
 }
 
-/* ---------- 국내 최저가 자동 검색 (선택) ----------
-   네이버 쇼핑 검색 API를 Cloudflare Worker로 감싼 주소를 넣으면 켜져요 (worker/naver-shop.js, README 참고).
-   API 키는 Worker에만 있고 이 파일에는 들어가지 않아요. 비어 있으면 네이버 쇼핑 검색 페이지를 열어 줘요. */
-const KR_API = "";   // 예: "https://fx-timing-naver.아이디.workers.dev"
+/* ---------- 국내가 자동 찾기 (준비만 해 둔 확장 지점) ----------
+   네이버 쇼핑 검색 API는 2026.7.31 종료돼서 쓰지 않아요.
+   쿠팡 파트너스 최종 승인(누적 판매 15만 원 이상) 뒤 상품 검색 API를 Worker로 감싸 주소를 넣으면 켜져요.
+   Worker 응답 형식: {items:[{title, price, mall, source, category}]}. 키는 Worker에만 두고 이 파일에는 넣지 않아요.
+   비어 있으면 "국내가 자동 찾기" 버튼은 숨겨지고, 네이버 쇼핑·쿠팡 검색 링크만 보여요. */
+const KR_API = "";   // 예: "https://fx-timing-kr.아이디.workers.dev"
 let krTimer = 0, krSeq = 0;
 async function findKR(auto){
   const q = $("c-name").value.trim();
   if (q.length < 2){ setText("c-krstate", "상품 이름을 먼저 넣어 주세요."); return; }
-  if (!KR_API){ if (!auto) window.open(naverURL(q), "_blank", "noopener"); return; }
-  const seq = ++krSeq; setText("c-krstate", "국내 최저가를 찾는 중…");
+  if (!KR_API) return;
+  const seq = ++krSeq; setText("c-krstate", "국내 판매가를 찾는 중…");
   try{
     const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 6000);
     const res = await fetch(`${KR_API.replace(/\/$/,"")}/shop?q=${encodeURIComponent(q)}`, {signal:ctl.signal}); clearTimeout(tm);
     if (seq !== krSeq) return;
     const d = await res.json(); const items = (d.items||[]).filter(i => i.price > 0).slice(0,5);
     if (!items.length){ setText("c-krstate", "검색 결과가 없어요. 직접 넣어 주세요."); $("c-krlist").hidden = true; return; }
-    $("c-krlist").innerHTML = items.map((i,k) => `<button class="kr-opt" type="button" data-k="${k}" data-price="${i.price}" data-mall="${esc(i.mall||"")}" data-cat="${esc(i.category||"")}"><span>${esc(i.title)}</span><b>${won(i.price)}</b><span class="m">${esc(i.mall||"")} · 네이버 쇼핑</span></button>`).join("");
+    $("c-krlist").innerHTML = items.map((i,k) => `<button class="kr-opt" type="button" data-k="${k}" data-price="${i.price}" data-mall="${esc(i.mall||i.source||"")}" data-cat="${esc(i.category||"")}"><span>${esc(i.title)}</span><b>${won(i.price)}</b><span class="m">${esc([i.mall, i.source].filter(Boolean).join(" · "))}</span></button>`).join("");
     $("c-krlist").hidden = false;
     setText("c-krstate", "같은 모델·용량인지 확인하고 골라 주세요.");
     track("kr-search");
-  }catch(e){ if (seq === krSeq){ setText("c-krstate", "최저가를 불러오지 못했어요. 직접 넣어 주세요."); $("c-krlist").hidden = true; } }
+  }catch(e){ if (seq === krSeq){ setText("c-krstate", "국내가를 불러오지 못했어요. 직접 넣어 주세요."); $("c-krlist").hidden = true; } }
 }
 
 /* ---------- 이용 통계 (선택) ----------
@@ -1972,12 +1978,13 @@ function init(){
     clearTimeout(krTimer);
     if (KR_API && !matchId && !krTouched) krTimer = setTimeout(() => findKR(true), 700);
   });
+  $("c-krfind").hidden = !KR_API;
   $("c-krfind").addEventListener("click", () => findKR(false));
   $("c-krlist").addEventListener("click", e => {
     const b = e.target.closest(".kr-opt"); if (!b) return;
     $("c-kr").value = b.dataset.price; krTouched = true;
     if (!matchId && !catTouched){ const g = kindFromCategory(b.dataset.cat); if (g){ $("c-cat").value = g; couponTouched = false; } }
-    const t = new Date(); setText("c-kr-src", `네이버 최저가 · ${b.dataset.mall} · ${t.getMonth()+1}/${t.getDate()} ${String(t.getHours()).padStart(2,"0")}:${String(t.getMinutes()).padStart(2,"0")} 확인`);
+    const t = new Date(); setText("c-kr-src", `국내 검색가 · ${b.dataset.mall} · ${t.getMonth()+1}/${t.getDate()} ${String(t.getHours()).padStart(2,"0")}:${String(t.getMinutes()).padStart(2,"0")} 확인`);
     $("c-krlist").hidden = true; setText("c-krstate", ""); renderCalc();
   });
   $("c-store").addEventListener("change", () => { couponTouched = false; feeTouched = false; applyStoreDefaults(); renderCalc(); });
