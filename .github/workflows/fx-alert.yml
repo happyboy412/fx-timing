@@ -1,0 +1,32 @@
+# 엔화 환율 알림: 평일 아침 ECB 기준환율을 확인해서 목표 이하면 이슈를 열어요.
+# 이슈가 열리면 GitHub가 저장소 주인에게 이메일(앱 설치 시 푸시)을 보내 줘요. 비밀키 설정이 필요 없어요.
+name: 엔화 환율 알림
+on:
+  schedule:
+    - cron: "30 0 * * 1-5"    # 평일 오전 9시 30분(한국 시간)
+  workflow_dispatch: {}        # Actions 탭에서 "Run workflow"로 바로 시험해 볼 수 있어요
+permissions:
+  issues: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        env:
+          TARGET: "840"          # 목표 환율(100엔당 원). 이 숫자만 바꾸면 돼요
+        with:
+          script: |
+            const urls = ["https://api.frankfurter.dev/v1/latest?base=USD&symbols=KRW,JPY",
+                          "https://api.frankfurter.app/latest?from=USD&to=KRW,JPY"];
+            let d = null;
+            for (const u of urls) { try { const r = await fetch(u); if (r.ok) { d = await r.json(); break; } } catch (e) {} }
+            if (!d) { core.warning("환율을 받지 못했어요"); return; }
+            const rate = d.rates.KRW / d.rates.JPY * 100, target = Number(process.env.TARGET);
+            core.info(`100엔 = ${rate.toFixed(2)}원 (${d.date}, 목표 ${target}원)`);
+            if (rate > target) return;
+            const {owner, repo} = context.repo;
+            const open = await github.rest.issues.listForRepo({owner, repo, state: "open", per_page: 50});
+            if (open.data.some(i => i.title.startsWith("[환율 알림]"))) { core.info("이미 열린 알림이 있어요"); return; }
+            await github.rest.issues.create({owner, repo,
+              title: `[환율 알림] 100엔 ${rate.toFixed(1)}원 — 목표 ${target}원 이하 (${d.date})`,
+              body: `ECB 기준환율 기준이라 은행 고시 환율과 조금 달라요.\n환전했다면 앱의 "내 지갑 환율"에 기록해 두세요.\n이 이슈를 닫으면 다음 알림을 다시 받아요.`});

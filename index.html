@@ -1,0 +1,1898 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>환율타이밍 — 일본 매장 3초 쇼핑 판정기</title>
+<meta name="description" content="일본 매장에서 가격표만 넣으면 한국보다 싼지 3초 만에 판정. 쿠폰·택스프리 환급·$800 면세 한도·세관 신고까지 계산해요.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="환율타이밍 · 일본 매장 3초 쇼핑 판정기">
+<meta property="og:description" content="가격표만 넣으면 한국보다 싼지 바로 판정. 쿠폰·환급·면세 한도·세관 신고까지.">
+<meta name="theme-color" content="#F2F4F6">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&family=Orbit&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- 갈무리 픽셀 글꼴(OFL, 레트로 테마). 파일로 열면 적용되고, 외부 글꼴을 막는 미리보기에서는 Orbit으로 대체돼요 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri@latest/dist/galmuri.css">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+[hidden]{display:none !important}
+/* ===== 기본 테마 (토스 디자인 시스템 기반) ===== */
+
+/* 환율타이밍 v6 · 기본 테마
+   토스 디자인 시스템(TDS) 공개 토큰을 따라 만들었어요.
+   - 흰색·회색 면을 넓게 쓰고, 파란색(#3182F6)은 결과와 주요 행동에만 써요.
+   - 그라데이션·장식 그림자 없이, 떠 있는 요소(하단 탭·요약 바·알림)에만 그림자를 줘요.
+   - 한 구획에는 메시지 하나. 긴 설명은 접어 두고, 문구는 짧은 해요체로 써요. */
+:root:not([data-theme="retro"]){
+  --blue-50:#E8F3FF; --blue-100:#C9E2FF; --blue-200:#90C2FF; --blue-500:#3182F6; --blue-600:#2272EB; --blue-700:#1B64DA;
+  --grey-50:#F9FAFB; --grey-100:#F2F4F6; --grey-200:#E5E8EB; --grey-300:#D1D6DB; --grey-400:#B0B8C1; --grey-500:#8B95A1;
+  --grey-600:#6B7684; --grey-700:#4E5968; --grey-800:#333D4B; --grey-900:#191F28;
+  --red:#F04452; --red-bg:#FFEEEE; --red-fg:#D22030; --green-bg:#F0FAF6; --green-fg:#029359; --orange-bg:#FFF9E7; --orange-fg:#DD7D02;
+  /* 레트로 테마와 같이 쓰는 이름 */
+  --ink:var(--grey-900); --muted:var(--grey-600); --line:var(--grey-200); --field:var(--grey-100); --card:#FFFFFF; --paper:var(--grey-100);
+  --accent:var(--blue-500); --accent-2:var(--blue-600); --accent-bg:var(--blue-50);
+  --good:var(--blue-700); --good-bg:var(--blue-50); --bad:var(--red-fg); --bad-bg:var(--red-bg); --warn:var(--orange-fg); --warn-bg:var(--orange-bg); --even:var(--grey-700); --even-bg:var(--grey-100);
+  --display:"Pretendard Variable",Pretendard,"Toss Product Sans","Noto Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --body:var(--display);
+  --r-xl:24px; --r-lg:16px; --r-md:12px; --r-sm:8px;
+  --shadow-md:0 8px 24px rgba(0,23,51,.08); --shadow-sm:0 2px 6px rgba(0,23,51,.04);
+  --nav-h:64px;
+  color-scheme:light;
+}
+html:not([data-theme="retro"]) body{background:var(--grey-100);color:var(--grey-900);font-family:var(--body);font-size:15px;line-height:1.5;letter-spacing:-0.02em;-webkit-font-smoothing:antialiased;min-height:100vh;word-break:keep-all}
+html:not([data-theme="retro"]) h1,html:not([data-theme="retro"]) h2,html:not([data-theme="retro"]) h3{font-family:var(--display);margin:0;font-weight:700;letter-spacing:-0.03em;text-wrap:balance}
+html:not([data-theme="retro"]) h2{font-size:20px;line-height:1.4} html:not([data-theme="retro"]) h3{font-size:17px;line-height:1.45}
+html:not([data-theme="retro"]) p{margin:0}
+html:not([data-theme="retro"]) a{color:var(--blue-700)}
+html:not([data-theme="retro"]) b,html:not([data-theme="retro"]) .num{font-variant-numeric:tabular-nums;font-weight:600}
+html:not([data-theme="retro"]) .muted{color:var(--grey-600)} html:not([data-theme="retro"]) .small{font-size:14px} html:not([data-theme="retro"]) .tiny{font-size:13px;line-height:1.5}
+html:not([data-theme="retro"]) .wrap{margin:0 auto;padding:12px 16px calc(var(--nav-h) + 120px);display:flex;flex-direction:column;gap:12px;max-width:520px}
+html:not([data-theme="retro"]) .panel{background:#fff;border-radius:var(--r-xl);padding:24px 20px}
+html:not([data-theme="retro"]) .stack{display:flex;flex-direction:column;gap:16px}
+html:not([data-theme="retro"]) .stack-sm{display:flex;flex-direction:column;gap:6px}
+html:not([data-theme="retro"]) .between{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+html:not([data-theme="retro"]) .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:15px;color:var(--grey-700);padding:2px 0}
+html:not([data-theme="retro"]) .row b{color:var(--grey-900);white-space:nowrap}
+html:not([data-theme="retro"]) .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}
+html:not([data-theme="retro"]) .span2{grid-column:1/-1}
+
+/* 상단: 서비스 이름만 작게. 큰 장식 영역은 두지 않아요 */
+html:not([data-theme="retro"]) .hero{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 4px 4px}
+html:not([data-theme="retro"]) .hero-art,html:not([data-theme="retro"]) .hero-plane{display:none}
+html:not([data-theme="retro"]) .hero-text{display:flex;flex-direction:column;gap:0}
+html:not([data-theme="retro"]) .hero h1{font-size:22px;line-height:1.3;color:var(--grey-900)}
+html:not([data-theme="retro"]) .hero h1::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--blue-500);margin-right:8px;vertical-align:2px}
+html:not([data-theme="retro"]) .hero .sub{font-size:13px;color:var(--grey-600);font-weight:500}
+html:not([data-theme="retro"]) .hero p,html:not([data-theme="retro"]) .hero .tag{display:none}
+html:not([data-theme="retro"]) .hero-actions{display:flex;gap:8px;align-items:center}
+html:not([data-theme="retro"]) .tag{font-size:12px;font-weight:600;color:var(--grey-600);background:var(--grey-200);border-radius:var(--r-sm);padding:4px 8px}
+
+/* 입력 */
+html:not([data-theme="retro"]) .field{display:flex;flex-direction:column;gap:8px;font-size:14px;font-weight:500;color:var(--grey-700)}
+html:not([data-theme="retro"]) .field .hint{order:1;font-size:13px;font-weight:400;color:var(--grey-600)}
+html:not([data-theme="retro"]) .toggle{display:flex;align-items:flex-start;gap:10px;font-size:15px;color:var(--grey-800);cursor:pointer}
+html:not([data-theme="retro"]) .toggle input{margin-top:2px}
+html:not([data-theme="retro"]) select,html:not([data-theme="retro"]) input[type=date],html:not([data-theme="retro"]) input[type=number],html:not([data-theme="retro"]) input[type=text]{width:100%;min-width:0;min-height:52px;padding:12px 16px;border:1px solid var(--grey-200);border-radius:var(--r-md);background:#fff;color:var(--grey-900);font:inherit;font-size:17px;font-weight:500;appearance:none;-webkit-appearance:none}
+html:not([data-theme="retro"]) select{background-image:linear-gradient(45deg,transparent 50%,var(--grey-500) 50%),linear-gradient(135deg,var(--grey-500) 50%,transparent 50%);background-position:calc(100% - 20px) 52%,calc(100% - 15px) 52%;background-size:5px 5px;background-repeat:no-repeat;padding-right:36px}
+html:not([data-theme="retro"]) input::placeholder{color:var(--grey-400)}
+html:not([data-theme="retro"]) input:focus,html:not([data-theme="retro"]) select:focus{outline:2px solid var(--blue-500);outline-offset:-1px;border-color:transparent}
+html:not([data-theme="retro"]) input[type=range]{width:100%;accent-color:var(--blue-500);height:28px}
+html:not([data-theme="retro"]) input[type=checkbox]{accent-color:var(--blue-500);width:20px;height:20px;flex:none}
+html:not([data-theme="retro"]) textarea{width:100%;padding:14px 16px;border:1px solid var(--grey-200);border-radius:var(--r-md);background:var(--grey-50);color:var(--grey-800);font:inherit;font-size:14px;line-height:1.6;resize:vertical}
+html:not([data-theme="retro"]) button:focus-visible,html:not([data-theme="retro"]) a:focus-visible,html:not([data-theme="retro"]) summary:focus-visible{outline:2px solid var(--blue-700);outline-offset:2px}
+
+/* 버튼 */
+html:not([data-theme="retro"]) .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:48px;padding:12px 20px;border:0;border-radius:var(--r-lg);background:var(--blue-50);color:var(--blue-700);font:inherit;font-size:16px;font-weight:600;letter-spacing:-0.02em;cursor:pointer;text-decoration:none;transition:background .15s,transform .1s}
+html:not([data-theme="retro"]) .btn:hover{background:var(--blue-100)}
+html:not([data-theme="retro"]) .btn:active{transform:scale(.98)}
+html:not([data-theme="retro"]) .btn-primary{width:100%;min-height:56px;background:var(--blue-500);color:#fff;font-size:17px}
+html:not([data-theme="retro"]) .btn-primary:hover{background:var(--blue-600)}
+html:not([data-theme="retro"]) .btn-ghost{background:var(--grey-100);color:var(--grey-700)}
+html:not([data-theme="retro"]) .btn-ghost:hover{background:var(--grey-200)}
+html:not([data-theme="retro"]) .btn-dark{background:var(--grey-800);color:#fff}
+html:not([data-theme="retro"]) .btn-sm{min-height:36px;padding:7px 12px;border-radius:10px;font-size:14px}
+html:not([data-theme="retro"]) .btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+html:not([data-theme="retro"]) .theme-btn{background:#fff;color:var(--grey-700)}
+
+/* 배지·안내 */
+html:not([data-theme="retro"]) .chip{display:inline-flex;align-items:center;font-size:13px;font-weight:600;border-radius:var(--r-sm);padding:4px 8px;white-space:nowrap}
+html:not([data-theme="retro"]) .chip-good{color:var(--blue-700);background:var(--blue-50)} html:not([data-theme="retro"]) .chip-bad{color:var(--red-fg);background:var(--red-bg)}
+html:not([data-theme="retro"]) .chip-warn{color:var(--orange-fg);background:var(--orange-bg)} html:not([data-theme="retro"]) .chip-neutral{color:var(--grey-600);background:var(--grey-100)} html:not([data-theme="retro"]) .chip-accent{color:var(--blue-700);background:var(--blue-50)}
+html:not([data-theme="retro"]) .note{font-size:14px;line-height:1.6;padding:14px 16px;border-radius:var(--r-lg);background:var(--grey-50);color:var(--grey-700)}
+html:not([data-theme="retro"]) .note-warn{background:var(--orange-bg);color:#9A5700}
+html:not([data-theme="retro"]) .note-info{background:var(--blue-50);color:var(--blue-700)}
+html:not([data-theme="retro"]) .note-good{background:var(--green-bg);color:var(--green-fg)}
+
+/* 여행 설정: 한 줄 요약 + 펼치기 */
+html:not([data-theme="retro"]) .trip{background:#fff;border-radius:var(--r-xl);overflow:hidden}
+html:not([data-theme="retro"]) .trip summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:16px 20px;font-size:16px;font-weight:600;color:var(--grey-900)}
+html:not([data-theme="retro"]) .trip summary::-webkit-details-marker{display:none}
+html:not([data-theme="retro"]) .trip .plane{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--blue-50);color:var(--blue-500);font-size:17px;flex:none}
+html:not([data-theme="retro"]) .trip #trip-sum{flex:1;line-height:1.45}
+html:not([data-theme="retro"]) .trip .edit{font-size:14px;font-weight:600;color:var(--grey-700);background:var(--grey-100);border-radius:10px;padding:7px 12px}
+html:not([data-theme="retro"]) .trip[open] .edit::after{content:"접기"} html:not([data-theme="retro"]) .trip:not([open]) .edit::after{content:"변경"}
+html:not([data-theme="retro"]) .trip-body{padding:4px 20px 24px;border-top:1px solid var(--grey-100)}
+html:not([data-theme="retro"]) .trip-body .grid2{padding-top:16px}
+
+/* 탭: 휴대폰은 하단 고정 바 */
+html:not([data-theme="retro"]) .tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;height:calc(var(--nav-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);display:grid;grid-template-columns:repeat(3,1fr);background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--grey-200)}
+html:not([data-theme="retro"]) .tabs button{border:0;background:transparent;font:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--grey-500)}
+html:not([data-theme="retro"]) .tabs b{font-size:14px;font-weight:600}
+html:not([data-theme="retro"]) .tabs span{font-size:11px}
+html:not([data-theme="retro"]) .tabs button[aria-selected="true"]{color:var(--grey-900)}
+html:not([data-theme="retro"]) .tabs button[aria-selected="true"] b{font-weight:700}
+html:not([data-theme="retro"]) .tabs button[aria-selected="true"] span{color:var(--blue-500)}
+html:not([data-theme="retro"]) .tabpanel{display:flex;flex-direction:column;gap:12px}
+
+/* 출국 전 */
+html:not([data-theme="retro"]) .fx{display:flex;flex-direction:column;gap:16px}
+html:not([data-theme="retro"]) .fx h2{font-size:15px;font-weight:600;color:var(--grey-600)}
+html:not([data-theme="retro"]) .big{font-size:44px;font-weight:700;letter-spacing:-0.04em;line-height:1.1;color:var(--grey-900)}
+html:not([data-theme="retro"]) svg text{fill:var(--grey-500);font-size:11px;font-family:var(--body)}
+html:not([data-theme="retro"]) .sp-line{fill:none;stroke:var(--blue-500);stroke-width:2.5;stroke-linecap:round}
+html:not([data-theme="retro"]) .sp-area{fill:url(#sp-grad)}
+html:not([data-theme="retro"]) .sp-dot{fill:#fff;stroke:var(--blue-500);stroke-width:2}
+html:not([data-theme="retro"]) .sp-now{fill:var(--blue-500)}
+html:not([data-theme="retro"]) .sp-now-label{fill:var(--blue-700);font-weight:700}
+html:not([data-theme="retro"]) .wallet{border-radius:var(--r-lg);padding:20px;background:var(--grey-50)}
+html:not([data-theme="retro"]) .wallet h3{font-size:17px}
+html:not([data-theme="retro"]) .wallet p{color:var(--grey-700);font-size:14px;line-height:1.6}
+html:not([data-theme="retro"]) .wallet .btn{width:100%}
+html:not([data-theme="retro"]) .cards{display:grid;grid-template-columns:1fr;gap:12px}
+html:not([data-theme="retro"]) .offer{gap:12px}
+html:not([data-theme="retro"]) .offer ul{margin:0;padding-left:18px;font-size:14px;color:var(--grey-700)}
+html:not([data-theme="retro"]) .offer .btn{width:100%}
+html:not([data-theme="retro"]) .cardtable{display:flex;flex-direction:column;font-size:13px;border:1px solid var(--grey-200);border-radius:var(--r-md);overflow:hidden}
+html:not([data-theme="retro"]) .ct-row{display:grid;grid-template-columns:1.3fr .6fr .9fr 1.3fr;gap:8px;padding:10px 12px;border-top:1px solid var(--grey-100);align-items:center;color:var(--grey-700)}
+html:not([data-theme="retro"]) .ct-row:first-child{border-top:0}
+html:not([data-theme="retro"]) .ct-head{background:var(--grey-50);font-weight:600;color:var(--grey-600);font-size:12px}
+html:not([data-theme="retro"]) .ct-row a{font-weight:600;text-decoration:none}
+html:not([data-theme="retro"]) .prep>.between h2{font-size:20px}
+
+/* 매장 계산기 */
+html:not([data-theme="retro"]) .calc h2{font-size:22px;line-height:1.35}
+html:not([data-theme="retro"]) .picks{display:flex;gap:8px;flex-wrap:wrap}
+html:not([data-theme="retro"]) .pick{border:0;border-radius:10px;background:var(--grey-100);color:var(--grey-700);padding:8px 12px;font:inherit;font-size:14px;font-weight:500;cursor:pointer}
+html:not([data-theme="retro"]) .pick:hover{background:var(--grey-200)}
+html:not([data-theme="retro"]) .pick[aria-pressed="true"]{background:var(--blue-50);color:var(--blue-700);font-weight:600}
+html:not([data-theme="retro"]) .verdict{border-radius:var(--r-xl);padding:24px 20px;display:flex;flex-direction:column;gap:10px;background:var(--grey-100);color:var(--grey-800)}
+html:not([data-theme="retro"]) .verdict .v{font-size:26px;font-weight:700;letter-spacing:-0.03em;line-height:1.35}
+html:not([data-theme="retro"]) .verdict .d{font-size:15px;line-height:1.7;color:var(--grey-700)}
+html:not([data-theme="retro"]) .verdict .d b{color:var(--grey-900)}
+html:not([data-theme="retro"]) .verdict.is-good{background:var(--blue-50)} html:not([data-theme="retro"]) .verdict.is-good .v{color:var(--blue-700)}
+html:not([data-theme="retro"]) .verdict.is-bad{background:var(--red-bg)} html:not([data-theme="retro"]) .verdict.is-bad .v{color:var(--red-fg)}
+html:not([data-theme="retro"]) .verdict.is-even{background:var(--grey-100)} html:not([data-theme="retro"]) .verdict.is-even .v{color:var(--grey-800)}
+html:not([data-theme="retro"]) .verdict.is-check{background:var(--orange-bg)} html:not([data-theme="retro"]) .verdict.is-check .v{color:var(--orange-fg)}
+html:not([data-theme="retro"]) .verdict .spec{font-size:14px;font-weight:500;color:#9A5700;background:#fff;border-radius:var(--r-md);padding:10px 12px}
+html:not([data-theme="retro"]) .money{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+html:not([data-theme="retro"]) .money div{background:var(--grey-50);border-radius:var(--r-lg);padding:12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+html:not([data-theme="retro"]) .money span{font-size:12px;color:var(--grey-600)}
+html:not([data-theme="retro"]) .money b{font-size:16px;white-space:nowrap;color:var(--grey-900)}
+html:not([data-theme="retro"]) .money .is-final{background:var(--blue-50)} html:not([data-theme="retro"]) .money .is-final b{color:var(--blue-700)}
+html:not([data-theme="retro"]) .more{border-radius:var(--r-lg);background:var(--grey-50)}
+html:not([data-theme="retro"]) .more summary{cursor:pointer;list-style:none;display:flex;gap:12px;align-items:center;justify-content:space-between;padding:16px;font-size:15px}
+html:not([data-theme="retro"]) .more summary::-webkit-details-marker{display:none}
+html:not([data-theme="retro"]) .more summary::after{content:"";width:8px;height:8px;border-right:2px solid var(--grey-500);border-bottom:2px solid var(--grey-500);transform:rotate(45deg);margin:0 4px 4px 0;flex:none;transition:transform .15s}
+html:not([data-theme="retro"]) .more[open] summary::after{transform:rotate(225deg);margin-bottom:-4px}
+html:not([data-theme="retro"]) .more>.stack{padding:0 16px 16px}
+html:not([data-theme="retro"]) .more summary .small{flex:1;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+html:not([data-theme="retro"]) .paths{display:flex;flex-direction:column;gap:10px}
+html:not([data-theme="retro"]) .paths>b{font-size:15px}
+html:not([data-theme="retro"]) .path-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+html:not([data-theme="retro"]) .path-btn{display:flex;flex-direction:column;gap:2px;text-align:left;padding:14px 16px;border:1px solid var(--grey-200);border-radius:var(--r-lg);background:#fff;color:var(--grey-900);font:inherit;text-decoration:none;cursor:pointer}
+html:not([data-theme="retro"]) .path-btn .t{font-weight:600;font-size:15px}
+html:not([data-theme="retro"]) .path-btn .s{font-size:13px;color:var(--grey-600)}
+html:not([data-theme="retro"]) .path-btn.is-recommended{border-color:var(--blue-500);background:var(--blue-50)} html:not([data-theme="retro"]) .path-btn.is-recommended .t{color:var(--blue-700)}
+html:not([data-theme="retro"]) .path-btn[aria-disabled="true"]{cursor:default;color:var(--grey-500);background:var(--grey-50);border-style:dashed}
+
+/* 참고 상품: 카드 대신 목록 */
+html:not([data-theme="retro"]) .items{display:flex;flex-direction:column;background:#fff;border-radius:var(--r-xl);padding:8px 20px}
+html:not([data-theme="retro"]) .item{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:start;padding:18px 0;border-top:1px solid var(--grey-100)}
+html:not([data-theme="retro"]) .item:first-child{border-top:0}
+html:not([data-theme="retro"]) .item h3{font-size:16px;font-weight:600}
+html:not([data-theme="retro"]) .item .meta{font-size:13px;color:var(--grey-600);margin-top:2px}
+html:not([data-theme="retro"]) .item .save{text-align:right;max-width:150px}
+html:not([data-theme="retro"]) .item .save b{display:block;font-size:17px;font-weight:700;line-height:1.4}
+html:not([data-theme="retro"]) .item .save [data-k="v"]{display:block;font-size:12px;line-height:1.4;color:var(--grey-600)}
+html:not([data-theme="retro"]) .item.is-good .save b{color:var(--blue-700)} html:not([data-theme="retro"]) .item.is-bad .save b{color:var(--red-fg)} html:not([data-theme="retro"]) .item.is-even .save b{color:var(--grey-700)} html:not([data-theme="retro"]) .item.is-check .save b{color:var(--orange-fg)}
+html:not([data-theme="retro"]) .item .acts{display:flex;gap:6px;justify-content:flex-end;margin-top:8px}
+html:not([data-theme="retro"]) .item .extra{grid-column:1/-1;display:flex;flex-direction:column;gap:6px}
+html:not([data-theme="retro"]) .item .src{font-size:12px;color:var(--grey-500)}
+html:not([data-theme="retro"]) .item .spec{font-size:13px;font-weight:500;color:#9A5700;background:var(--orange-bg);border-radius:10px;padding:8px 10px}
+
+/* 쇼핑 리스트 */
+html:not([data-theme="retro"]) .person{display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:var(--r-lg);background:var(--grey-50)}
+html:not([data-theme="retro"]) .person>.between>b{font-size:16px}
+html:not([data-theme="retro"]) .gauge{position:relative;height:8px;border-radius:4px;background:var(--grey-200);overflow:hidden;display:flex}
+html:not([data-theme="retro"]) .gauge i{display:block;height:100%;transition:width .3s}
+html:not([data-theme="retro"]) .gauge .g-dfs{background:var(--grey-400)}
+html:not([data-theme="retro"]) .gauge .g-shop{background:var(--blue-500)}
+html:not([data-theme="retro"]) .gauge.is-over .g-shop{background:var(--red)}
+html:not([data-theme="retro"]) .line{display:grid;grid-template-columns:1fr;gap:8px;padding:12px 0;border-top:1px solid var(--grey-200);font-size:14px}
+html:not([data-theme="retro"]) .line .name{font-weight:600;font-size:15px}
+html:not([data-theme="retro"]) .line .sub{font-size:13px;color:var(--grey-600);line-height:1.5}
+html:not([data-theme="retro"]) .line .ctrls{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+html:not([data-theme="retro"]) .line.is-kr .name{color:var(--grey-500);text-decoration:line-through;text-decoration-color:var(--grey-300)}
+html:not([data-theme="retro"]) .seg{display:inline-flex;border-radius:10px;background:var(--grey-200);padding:2px}
+html:not([data-theme="retro"]) .seg button{border:0;border-radius:8px;background:transparent;font:inherit;font-size:13px;font-weight:600;padding:6px 10px;color:var(--grey-600);cursor:pointer}
+html:not([data-theme="retro"]) .seg button[aria-pressed="true"]{background:#fff;color:var(--grey-900);box-shadow:var(--shadow-sm)}
+html:not([data-theme="retro"]) .qty{display:inline-flex;align-items:center;border-radius:10px;background:#fff;border:1px solid var(--grey-200)}
+html:not([data-theme="retro"]) .qty button{width:32px;height:32px;border:0;background:transparent;font:inherit;font-size:16px;font-weight:600;cursor:pointer;color:var(--grey-800)}
+html:not([data-theme="retro"]) .qty button:disabled{color:var(--grey-300);cursor:default}
+html:not([data-theme="retro"]) .qty span{min-width:20px;text-align:center;font-weight:600}
+html:not([data-theme="retro"]) .line select{min-height:34px;padding:4px 30px 4px 10px;font-size:13px;border-radius:10px;width:auto}
+html:not([data-theme="retro"]) .dfs-input{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--grey-600)}
+html:not([data-theme="retro"]) .dfs-input input{width:96px;min-height:36px;padding:6px 10px;font-size:14px;border-radius:10px}
+html:not([data-theme="retro"]) .total{font-size:30px;font-weight:700;letter-spacing:-0.03em;line-height:1.3;color:var(--blue-700)}
+html:not([data-theme="retro"]) .total.is-bad{color:var(--red-fg)}
+html:not([data-theme="retro"]) .share-btns{display:flex;gap:8px;flex-wrap:wrap}
+
+/* 귀국 전 */
+html:not([data-theme="retro"]) .receipt{display:flex;flex-direction:column;gap:6px;padding:20px;border-radius:var(--r-lg);background:var(--grey-50)}
+html:not([data-theme="retro"]) .receipt .head{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;margin-bottom:4px;border-bottom:1px solid var(--grey-200)}
+html:not([data-theme="retro"]) .receipt .head b{font-size:17px;font-weight:700}
+html:not([data-theme="retro"]) .receipt .items-mini{font-size:13px;color:var(--grey-600);padding-bottom:4px}
+html:not([data-theme="retro"]) .checklist label{display:flex;gap:12px;align-items:flex-start;font-size:15px;color:var(--grey-800);line-height:1.6}
+
+/* 근거: 접어 두기 */
+html:not([data-theme="retro"]) .sources{font-size:13px;color:var(--grey-600)}
+html:not([data-theme="retro"]) .sources summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:600;color:var(--grey-800)}
+html:not([data-theme="retro"]) .sources summary::-webkit-details-marker{display:none}
+html:not([data-theme="retro"]) .sources summary::after{content:"";width:8px;height:8px;border-right:2px solid var(--grey-500);border-bottom:2px solid var(--grey-500);transform:rotate(45deg)}
+html:not([data-theme="retro"]) .sources[open] summary::after{transform:rotate(225deg)}
+html:not([data-theme="retro"]) .sources ul{margin:14px 0 0;padding-left:16px;line-height:1.65}
+html:not([data-theme="retro"]) .sources li{margin-bottom:8px;word-break:break-all}
+
+/* 알림·요약 바 */
+html:not([data-theme="retro"]) .toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + 92px);transform:translate(-50%,12px);z-index:30;max-width:min(420px,calc(100% - 32px));padding:14px 18px;border-radius:var(--r-lg);background:rgba(25,31,40,.92);color:#fff;font-size:15px;font-weight:500;line-height:1.5;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+html:not([data-theme="retro"]) .toast.is-on{opacity:1;transform:translate(-50%,0)}
+html:not([data-theme="retro"]) .minibar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav-h) + 12px);z-index:19;width:min(488px,calc(100% - 24px));display:flex;gap:14px;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:var(--r-lg);background:#fff;box-shadow:var(--shadow-md)}
+html:not([data-theme="retro"]) .minibar .gauge{width:96px;height:6px}
+html:not([data-theme="retro"]) .minibar b{font-size:16px}
+html:not([data-theme="retro"]) .minibar .small{font-size:12px}
+html:not([data-theme="retro"]) .minibar.is-pulse{animation:tpulse .6s ease-out}
+@keyframes tpulse{0%{box-shadow:0 0 0 0 rgba(49,130,246,.45),var(--shadow-md)}100%{box-shadow:0 0 0 12px rgba(49,130,246,0),var(--shadow-md)}}
+html:not([data-theme="retro"]) .fx-box{justify-content:flex-end}
+
+/* 넓은 화면: 위쪽 탭 + 2단 */
+@media (min-width:880px){
+  html:not([data-theme="retro"]) .wrap{max-width:1120px;padding:24px 32px 64px;gap:16px}
+  html:not([data-theme="retro"]) .hero{padding:8px 0}
+  html:not([data-theme="retro"]) .hero h1{font-size:24px}
+  html:not([data-theme="retro"]) .trip-body .grid2{grid-template-columns:1fr 1fr 1fr 2fr}
+  html:not([data-theme="retro"]) .trip-body .span2{grid-column:auto}
+  html:not([data-theme="retro"]) .tabs{position:static;height:auto;padding:4px;border:0;border-radius:var(--r-lg);background:var(--grey-200);gap:4px;backdrop-filter:none}
+  html:not([data-theme="retro"]) .tabs button{flex-direction:row;gap:8px;padding:12px 8px;border-radius:12px;color:var(--grey-600)}
+  html:not([data-theme="retro"]) .tabs span{font-size:13px}
+  html:not([data-theme="retro"]) .tabs button[aria-selected="true"]{background:#fff;box-shadow:var(--shadow-sm)}
+  html:not([data-theme="retro"]) .main{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px;align-items:start}
+  html:not([data-theme="retro"]) .cart{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto}
+  html:not([data-theme="retro"]) .calc .grid2{grid-template-columns:repeat(4,1fr)}
+  html:not([data-theme="retro"]) .calc .grid2 .span2{grid-column:span 2}
+  html:not([data-theme="retro"]) .calc .grid2 .picks{grid-column:1/-1;order:5}
+  html:not([data-theme="retro"]) .fx{display:grid;grid-template-columns:300px 1fr;align-items:center;gap:32px}
+  html:not([data-theme="retro"]) .big{font-size:56px}
+  html:not([data-theme="retro"]) #p-before{display:grid;grid-template-columns:1fr 1fr;gap:16px;grid-auto-flow:row dense;align-items:start}
+  html:not([data-theme="retro"]) #p-before>.fx,html:not([data-theme="retro"]) #p-before>.prep{grid-column:1/-1}
+  html:not([data-theme="retro"]) .cards{grid-template-columns:repeat(3,1fr)}
+  html:not([data-theme="retro"]) #decl{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  html:not([data-theme="retro"]) #p-after{display:grid;grid-template-columns:3fr 2fr;gap:16px;align-items:start}
+  html:not([data-theme="retro"]) .items{display:grid;grid-template-columns:1fr 1fr;column-gap:32px}
+  html:not([data-theme="retro"]) .item:nth-child(2){border-top:0}
+  html:not([data-theme="retro"]) .minibar{display:none}
+  html:not([data-theme="retro"]) .toast{bottom:32px}
+}
+@media (prefers-reduced-motion:reduce){html:not([data-theme="retro"]) .gauge i,html:not([data-theme="retro"]) .toast,html:not([data-theme="retro"]) .btn{transition:none}html:not([data-theme="retro"]) .minibar.is-pulse{animation:none}}
+
+/* ===== 레트로 테마의 바탕 (이전 모던 규칙) ===== */
+
+/* 환율타이밍 v5 · 모던 테마
+   상태는 클래스(.is-good, .is-recommended, .receipt …)로 표현해요. 인라인 style 문자열을 선택자로 쓰지 않고,
+   JS가 직접 만지는 스타일은 게이지 너비 하나뿐이에요. */
+:root[data-theme="retro"]{
+  --ink:#0F2236; --paper:#F2F8FD; --card:#FFFFFF; --muted:#5D7186; --line:#E2ECF5; --field:#EEF5FB;
+  --accent:#1E6FE8; --accent-2:#1FB5C4; --accent-bg:#E2F0FF;
+  --good:#12A26B; --good-bg:#E7F8F0; --bad:#E5404F; --bad-bg:#FFEFF1; --warn:#A85B07; --warn-bg:#FFF3E3; --even:#5C5C70; --even-bg:#F0F0F5;
+  --display:"Inter Tight","Pretendard Variable",Pretendard,"Noto Sans KR",system-ui,sans-serif;
+  --body:"Pretendard Variable",Pretendard,"Noto Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --r-xl:28px; --r-lg:20px; --r-md:14px;
+  --shadow:0 1px 2px rgba(22,22,29,.04),0 8px 24px rgba(30,111,232,.06);
+  --nav-h:72px;
+  color-scheme:light;
+}
+html[data-theme="retro"] *{box-sizing:border-box}
+html,html[data-theme="retro"] body{margin:0}
+[hidden]{display:none !important}
+html[data-theme="retro"] body{color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;letter-spacing:-0.012em;-webkit-font-smoothing:antialiased;min-height:100vh;
+  background:radial-gradient(900px 520px at 8% -8%,#CDE9FF 0%,transparent 60%),radial-gradient(700px 480px at 100% 0%,#CFF6EE 0%,transparent 60%),radial-gradient(800px 600px at 50% 110%,#D9ECFF 0%,transparent 60%),var(--paper);background-attachment:fixed}
+html[data-theme="retro"] h1,html[data-theme="retro"] h2,html[data-theme="retro"] h3{font-family:var(--display);font-weight:700;margin:0;letter-spacing:-0.03em;word-break:keep-all;text-wrap:balance}
+html[data-theme="retro"] h2{font-size:20px} html[data-theme="retro"] h3{font-size:16.5px}
+html[data-theme="retro"] p{margin:0;word-break:keep-all}
+html[data-theme="retro"] a{color:var(--accent)}
+html[data-theme="retro"] b,html[data-theme="retro"] .num{font-variant-numeric:tabular-nums}
+html[data-theme="retro"] .muted{color:var(--muted)} html[data-theme="retro"] .small{font-size:12.5px} html[data-theme="retro"] .tiny{font-size:11.5px}
+html[data-theme="retro"] .wrap{margin:0 auto;padding:18px 16px calc(var(--nav-h) + 110px);display:flex;flex-direction:column;gap:14px;max-width:480px}
+html[data-theme="retro"] .panel{background:var(--card);border-radius:var(--r-xl);padding:22px;box-shadow:var(--shadow)}
+html[data-theme="retro"] .stack{display:flex;flex-direction:column;gap:12px}
+html[data-theme="retro"] .stack-sm{display:flex;flex-direction:column;gap:6px}
+html[data-theme="retro"] .between{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+html[data-theme="retro"] .row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14px}
+html[data-theme="retro"] .row b{font-weight:700;white-space:nowrap}
+html[data-theme="retro"] .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}
+html[data-theme="retro"] .span2{grid-column:1/-1}
+
+/* 히어로 */
+html[data-theme="retro"] .hero{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px;padding:26px 22px 24px;border-radius:var(--r-xl);background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(255,255,255,.74));box-shadow:var(--shadow)}
+html[data-theme="retro"] .hero::before{content:"";position:absolute;right:-60px;top:-70px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#A8F0E2,#8CC8FF 55%,transparent 72%);filter:blur(6px);opacity:.9}
+html[data-theme="retro"] .hero>*{position:relative}
+html[data-theme="retro"] .hero h1{font-size:40px;line-height:1.05}
+html[data-theme="retro"] .hero .sub{font-family:var(--body);font-weight:700;font-size:20px;letter-spacing:-0.02em;background:linear-gradient(90deg,var(--accent),#14A9A0);-webkit-background-clip:text;background-clip:text;color:transparent}
+html[data-theme="retro"] .hero p{color:var(--muted);font-size:14px;max-width:46ch}
+html[data-theme="retro"] .tag{align-self:flex-start;font-size:11.5px;font-weight:600;border-radius:999px;padding:5px 11px;color:var(--accent);background:var(--accent-bg)}
+
+/* 입력 요소 */
+html[data-theme="retro"] .field{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:12.5px;color:var(--muted)}
+html[data-theme="retro"] .field .hint{order:1;font-weight:500;font-size:11.5px;color:var(--accent)}
+html[data-theme="retro"] .toggle{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;font-weight:500;color:var(--ink);cursor:pointer}
+html[data-theme="retro"] .toggle input{margin-top:2px}
+html[data-theme="retro"] select,html[data-theme="retro"] input[type=date],html[data-theme="retro"] input[type=number],html[data-theme="retro"] input[type=text]{width:100%;min-width:0;padding:13px 15px;border:0;border-radius:var(--r-md);background:var(--field);color:var(--ink);font:inherit;font-size:15.5px;font-weight:600;appearance:none;-webkit-appearance:none}
+html[data-theme="retro"] select{background-image:linear-gradient(45deg,transparent 50%,#8FA3B6 50%),linear-gradient(135deg,#8FA3B6 50%,transparent 50%);background-position:calc(100% - 18px) 52%,calc(100% - 13px) 52%;background-size:5px 5px;background-repeat:no-repeat;padding-right:32px}
+html[data-theme="retro"] input:focus,html[data-theme="retro"] select:focus{outline:2px solid var(--accent);outline-offset:0;background-color:#fff}
+html[data-theme="retro"] input[type=range]{width:100%;accent-color:var(--accent);height:24px}
+html[data-theme="retro"] input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px;flex:none}
+html[data-theme="retro"] textarea{width:100%;padding:12px;border:0;border-radius:var(--r-md);background:var(--field);color:var(--ink);font:inherit;font-size:13px;resize:vertical}
+html[data-theme="retro"] button:focus-visible,html[data-theme="retro"] input:focus-visible,html[data-theme="retro"] select:focus-visible,html[data-theme="retro"] a:focus-visible,html[data-theme="retro"] summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* 버튼 */
+html[data-theme="retro"] .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:999px;padding:11px 16px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;background:var(--accent-bg);color:var(--accent)}
+html[data-theme="retro"] .btn-primary{width:100%;padding:16px;font-size:16px;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 10px 22px rgba(30,111,232,.28)}
+html[data-theme="retro"] .btn-ghost{background:var(--field);color:#3E5266}
+html[data-theme="retro"] .btn-dark{background:var(--ink);color:#fff}
+html[data-theme="retro"] .btn-sm{padding:6px 11px;font-size:12.5px}
+html[data-theme="retro"] .btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* 칩·안내 */
+html[data-theme="retro"] .chip{display:inline-flex;align-items:center;font-size:12px;font-weight:700;border-radius:999px;padding:4px 10px;white-space:nowrap}
+html[data-theme="retro"] .chip-good{color:var(--good);background:var(--good-bg)} html[data-theme="retro"] .chip-bad{color:var(--bad);background:var(--bad-bg)}
+html[data-theme="retro"] .chip-warn{color:var(--warn);background:var(--warn-bg)} html[data-theme="retro"] .chip-neutral{color:var(--muted);background:var(--field)} html[data-theme="retro"] .chip-accent{color:var(--accent);background:var(--accent-bg)}
+html[data-theme="retro"] .note{font-size:12.5px;line-height:1.5;padding:12px 14px;border-radius:var(--r-md);background:var(--field);color:#3E5266}
+html[data-theme="retro"] .note-warn{background:var(--warn-bg);color:var(--warn)}
+html[data-theme="retro"] .note-info{background:var(--accent-bg);color:#1652B8}
+html[data-theme="retro"] .note-good{background:var(--good-bg);color:#0D7C51}
+
+/* 여행 설정 (접이식) */
+html[data-theme="retro"] .trip{background:var(--card);border-radius:var(--r-xl);box-shadow:var(--shadow);overflow:hidden}
+html[data-theme="retro"] .trip summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:16px 18px;font-family:var(--display);font-weight:700;font-size:16.5px}
+html[data-theme="retro"] .trip summary::-webkit-details-marker{display:none}
+html[data-theme="retro"] .trip .plane{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--accent-bg);color:var(--accent);font-size:15px;flex:none}
+html[data-theme="retro"] .trip #trip-sum{flex:1}
+html[data-theme="retro"] .trip .edit{font-size:13px;font-weight:700;color:#fff;background:var(--ink);border-radius:999px;padding:7px 13px}
+html[data-theme="retro"] .trip[open] .edit::after{content:"접기"} html[data-theme="retro"] .trip:not([open]) .edit::after{content:"변경"}
+html[data-theme="retro"] .trip-body{padding:0 22px 22px}
+
+/* 탭 (휴대폰: 하단 고정) */
+html[data-theme="retro"] .tabs{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;z-index:20;width:min(456px,calc(100% - 24px));height:var(--nav-h);display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px;border-radius:999px;background:rgba(22,22,29,.92);backdrop-filter:blur(14px);box-shadow:0 12px 30px rgba(22,22,29,.25)}
+html[data-theme="retro"] .tabs button{border:0;border-radius:999px;background:transparent;color:#B9B8C8;font:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+html[data-theme="retro"] .tabs b{font-family:var(--display);font-size:14px}
+html[data-theme="retro"] .tabs span{font-size:10.5px;opacity:.85}
+html[data-theme="retro"] .tabs button[aria-selected="true"]{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent-2))}
+html[data-theme="retro"] .tabpanel{display:flex;flex-direction:column;gap:14px}
+
+/* 출국 전 */
+html[data-theme="retro"] .fx{display:flex;flex-direction:column;gap:10px}
+html[data-theme="retro"] .big{font-family:var(--display);font-size:54px;font-weight:700;letter-spacing:-0.045em;line-height:1}
+html[data-theme="retro"] svg text{fill:#8FA3B6;font-size:11px;font-family:var(--body)}
+html[data-theme="retro"] .sp-line{fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round}
+html[data-theme="retro"] .sp-area{fill:url(#sp-grad)}
+html[data-theme="retro"] .sp-dot{fill:#fff;stroke:var(--accent);stroke-width:2}
+html[data-theme="retro"] .sp-now{fill:var(--accent)}
+html[data-theme="retro"] .sp-now-label{fill:var(--accent);font-weight:700}
+html[data-theme="retro"] .wallet{position:relative;overflow:hidden;border-radius:var(--r-lg);padding:22px;color:#fff;background:linear-gradient(135deg,#1E6FE8 0%,#1FB5C4 60%,#6EE3CF 120%);box-shadow:0 14px 30px rgba(30,111,232,.30)}
+html[data-theme="retro"] .wallet::after{content:"";position:absolute;right:-40px;bottom:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.35),transparent 70%)}
+html[data-theme="retro"] .wallet>*{position:relative;z-index:1}
+html[data-theme="retro"] .wallet h3{color:#fff;font-size:19px}
+html[data-theme="retro"] .wallet p,html[data-theme="retro"] .wallet .field{color:rgba(255,255,255,.88)}
+html[data-theme="retro"] .wallet input{background:rgba(255,255,255,.18);color:#fff}
+html[data-theme="retro"] .wallet input:focus{background:rgba(255,255,255,.28);outline-color:#fff}
+html[data-theme="retro"] .wallet .btn{background:#fff;color:var(--accent)}
+html[data-theme="retro"] .cards{display:grid;grid-template-columns:1fr;gap:12px}
+html[data-theme="retro"] .offer ul{margin:0;padding-left:18px;font-size:13.5px;color:#3E5266}
+
+/* 매장 계산기 */
+html[data-theme="retro"] .calc h2{font-size:22px}
+html[data-theme="retro"] .verdict{border-radius:var(--r-lg);padding:20px;display:flex;flex-direction:column;gap:8px}
+html[data-theme="retro"] .verdict .v{font-family:var(--display);font-size:28px;font-weight:700;letter-spacing:-0.035em;line-height:1.1}
+html[data-theme="retro"] .verdict .d{font-size:13px;color:#3E5266}
+html[data-theme="retro"] .verdict .d b{color:var(--ink)}
+html[data-theme="retro"] .verdict.is-good{background:linear-gradient(135deg,#E7F8F0,#F2FBF6);color:var(--good)}
+html[data-theme="retro"] .verdict.is-bad{background:linear-gradient(135deg,#FFEFF1,#FFF6F7);color:var(--bad)}
+html[data-theme="retro"] .verdict.is-even{background:var(--even-bg);color:var(--even)}
+html[data-theme="retro"] .paths{background:var(--field);border-radius:var(--r-lg);padding:14px}
+html[data-theme="retro"] .path-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+html[data-theme="retro"] .path-btn{display:flex;flex-direction:column;gap:2px;text-align:left;padding:14px;border:0;border-radius:var(--r-md);background:#fff;color:var(--ink);font:inherit;text-decoration:none;box-shadow:0 1px 3px rgba(22,22,29,.06);cursor:pointer}
+html[data-theme="retro"] .path-btn .t{font-weight:700;font-size:14.5px}
+html[data-theme="retro"] .path-btn .s{font-size:12px;color:var(--muted)}
+html[data-theme="retro"] .path-btn.is-recommended{box-shadow:0 0 0 2px var(--accent) inset;color:var(--accent)}
+html[data-theme="retro"] .path-btn[aria-disabled="true"]{cursor:default;color:var(--muted);background:#F6FAFD}
+
+/* 추천 목록 */
+html[data-theme="retro"] .items{display:flex;flex-direction:column;gap:12px}
+html[data-theme="retro"] .item{position:relative;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;padding:20px;border-radius:var(--r-xl);background:var(--card);box-shadow:var(--shadow)}
+html[data-theme="retro"] .item::before{content:"";position:absolute;left:0;top:24px;bottom:24px;width:4px;border-radius:0 4px 4px 0;background:var(--line)}
+html[data-theme="retro"] .item.is-good::before{background:var(--good)} html[data-theme="retro"] .item.is-bad::before{background:var(--bad)} html[data-theme="retro"] .item.is-even::before{background:#B8B8C8}
+html[data-theme="retro"] .item h3{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+html[data-theme="retro"] .item .meta{font-size:12.5px;color:var(--muted);margin-top:4px}
+html[data-theme="retro"] .item .save{text-align:right;max-width:136px}
+html[data-theme="retro"] .item .save [data-k="v"]{display:block;font-size:12px;line-height:1.35;margin-top:2px}
+html[data-theme="retro"] .item .extra{grid-column:1/-1;display:flex;flex-direction:column;gap:6px}
+html[data-theme="retro"] .item .save b{display:block;font-family:var(--display);font-size:22px;line-height:1.2;letter-spacing:-0.03em}
+html[data-theme="retro"] .item.is-good .save b{color:var(--good)} html[data-theme="retro"] .item.is-bad .save b{color:var(--bad)} html[data-theme="retro"] .item.is-even .save b{color:var(--even)}
+html[data-theme="retro"] .item .acts{display:flex;gap:6px;justify-content:flex-end;margin-top:8px}
+
+/* 쇼핑 리스트 */
+html[data-theme="retro"] .person{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:var(--r-lg);background:#F8FBFE;border:1px solid var(--line)}
+html[data-theme="retro"] .gauge{position:relative;height:12px;border-radius:999px;background:#E3EDF6;overflow:hidden;display:flex}
+html[data-theme="retro"] .gauge i{display:block;height:100%;transition:width .3s}
+html[data-theme="retro"] .gauge .g-dfs{background:#BDBCCB}
+html[data-theme="retro"] .gauge .g-shop{background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+html[data-theme="retro"] .gauge.is-over .g-shop{background:linear-gradient(90deg,#FFB547,#FF7A45)}
+html[data-theme="retro"] .line{display:grid;grid-template-columns:1fr;gap:6px 10px;align-items:center;font-size:13px;padding:8px 0;border-top:1px dashed var(--line)}
+html[data-theme="retro"] .line .name{font-weight:600}
+html[data-theme="retro"] .line .sub{font-size:11.5px;color:var(--muted)}
+html[data-theme="retro"] .line .ctrls{display:flex;gap:6px;align-items:center;justify-content:flex-start;flex-wrap:wrap}
+html[data-theme="retro"] .qty{display:inline-flex;align-items:center;border-radius:999px;background:var(--field)}
+html[data-theme="retro"] .qty button{width:28px;height:28px;border:0;background:transparent;font:inherit;font-weight:700;cursor:pointer;color:var(--ink)}
+html[data-theme="retro"] .qty span{min-width:20px;text-align:center;font-weight:700;font-size:13px}
+html[data-theme="retro"] .line select{padding:5px 26px 5px 10px;font-size:12px;border-radius:999px;width:auto}
+html[data-theme="retro"] .dfs-input{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+html[data-theme="retro"] .dfs-input input{width:96px;padding:7px 12px;font-size:13px;border-radius:999px}
+html[data-theme="retro"] .total{font-family:var(--display);font-size:34px;font-weight:700;letter-spacing:-0.035em;line-height:1.1;color:var(--good)}
+html[data-theme="retro"] .total.is-bad{color:var(--bad)}
+
+/* 귀국 전 영수증 */
+html[data-theme="retro"] .receipt{display:flex;flex-direction:column;gap:6px;padding:20px;border-radius:var(--r-lg);background:#fff;border:1px solid var(--line)}
+html[data-theme="retro"] .receipt .head{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;margin-bottom:4px;border-bottom:2px dashed var(--line)}
+html[data-theme="retro"] .receipt .head b{font-family:var(--display);font-size:19px}
+html[data-theme="retro"] .receipt .items-mini{font-size:12.5px;color:var(--muted);padding-bottom:6px}
+html[data-theme="retro"] .checklist label{display:flex;gap:10px;align-items:flex-start;font-size:14px}
+
+/* 근거 */
+html[data-theme="retro"] .sources{font-size:12px;color:var(--muted)}
+html[data-theme="retro"] .sources ul{margin:6px 0 0;padding-left:16px}
+html[data-theme="retro"] .sources li{margin-bottom:6px;word-break:break-all}
+
+/* 토스트·미니 바 */
+html[data-theme="retro"] .toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + 96px);transform:translate(-50%,16px);z-index:30;max-width:min(420px,calc(100% - 32px));padding:12px 16px;border-radius:var(--r-md);background:var(--ink);color:#fff;font-size:13.5px;font-weight:600;box-shadow:0 10px 30px rgba(22,22,29,.25);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+html[data-theme="retro"] .toast.is-on{opacity:1;transform:translate(-50%,0)}
+html[data-theme="retro"] .minibar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav-h) + 22px);z-index:19;width:min(440px,calc(100% - 32px));display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:var(--r-lg);background:#fff;box-shadow:0 10px 30px rgba(22,22,29,.16)}
+html[data-theme="retro"] .minibar .gauge{width:110px;height:8px}
+html[data-theme="retro"] .minibar b{font-size:15px}
+html[data-theme="retro"] .minibar.is-pulse{animation:pulse .6s ease-out}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(30,111,232,.55)}100%{box-shadow:0 0 0 14px rgba(30,111,232,0)}}
+
+/* v5 추가: 판정 4단계·금액 3단·상세 조건·구매처 토글 */
+html[data-theme="retro"] .verdict.is-check{background:linear-gradient(135deg,#FFF3E3,#FFF9F1);color:var(--warn)}
+html[data-theme="retro"] .verdict .spec{display:flex;gap:6px;align-items:flex-start;font-size:12.5px;font-weight:600;color:var(--warn);background:#fff;border-radius:10px;padding:8px 10px}
+html[data-theme="retro"] .money{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+html[data-theme="retro"] .money div{background:var(--field);border-radius:var(--r-md);padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+html[data-theme="retro"] .money span{font-size:11.5px;color:var(--muted)}
+html[data-theme="retro"] .money b{font-size:15px;white-space:nowrap}
+html[data-theme="retro"] .money .is-final{background:var(--accent-bg)} html[data-theme="retro"] .money .is-final b{color:var(--accent)}
+html[data-theme="retro"] .more{border-radius:var(--r-lg);background:#F8FBFE;border:1px solid var(--line)}
+html[data-theme="retro"] .more summary{cursor:pointer;list-style:none;display:flex;gap:10px;align-items:baseline;justify-content:space-between;padding:13px 16px;font-size:14px}
+html[data-theme="retro"] .more summary::-webkit-details-marker{display:none}
+html[data-theme="retro"] .more summary::after{content:"열기";font-size:12px;font-weight:700;color:var(--accent)}
+html[data-theme="retro"] .more[open] summary::after{content:"닫기"}
+html[data-theme="retro"] .more>.stack{padding:0 16px 16px}
+html[data-theme="retro"] .more summary .small{flex:1;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html[data-theme="retro"] .seg{display:inline-flex;border-radius:999px;background:var(--field);padding:2px}
+html[data-theme="retro"] .seg button{border:0;border-radius:999px;background:transparent;font:inherit;font-size:11.5px;font-weight:700;padding:5px 9px;color:var(--muted);cursor:pointer}
+html[data-theme="retro"] .seg button[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(22,22,29,.12)}
+html[data-theme="retro"] .line.is-kr .name{color:var(--muted);text-decoration:line-through;text-decoration-color:#C9C8D6}
+html[data-theme="retro"] .line .tag-kr{font-size:11px;font-weight:700;color:var(--accent)}
+html[data-theme="retro"] .item .src{font-size:11.5px;color:var(--muted)}
+html[data-theme="retro"] .item .spec{font-size:12px;font-weight:600;color:var(--warn);background:var(--warn-bg);border-radius:10px;padding:7px 10px}
+html[data-theme="retro"] .item.is-check::before{background:#FFB547} html[data-theme="retro"] .item.is-check .save b{color:var(--warn)}
+
+/* v5.1 추가: 빠른 선택·테마 버튼·환율 상자 (레트로 그림은 모던에서 숨김) */
+html[data-theme="retro"] .hero-art,html[data-theme="retro"] .hero-plane{display:none}
+html[data-theme="retro"] .hero-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+html[data-theme="retro"] .hero-actions .tag{align-self:auto}
+html[data-theme="retro"] .picks{display:flex;gap:6px;flex-wrap:wrap}
+html[data-theme="retro"] .pick{border:0;border-radius:999px;background:var(--field);color:var(--ink);padding:7px 12px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+html[data-theme="retro"] .pick[aria-pressed="true"]{background:var(--accent);color:#fff}
+html[data-theme="retro"] .fx-box{justify-content:flex-end}
+
+html[data-theme="retro"] .cardtable{display:flex;flex-direction:column;font-size:12px;border-radius:var(--r-md);overflow:hidden;border:1px solid var(--line)}
+html[data-theme="retro"] .ct-row{display:grid;grid-template-columns:1.25fr .7fr .9fr 1.25fr;gap:6px;padding:8px 10px;border-top:1px solid var(--line);align-items:center}
+html[data-theme="retro"] .ct-row:first-child{border-top:0}
+html[data-theme="retro"] .ct-head{background:var(--field);font-weight:700;color:var(--muted);font-size:11.5px}
+html[data-theme="retro"] .ct-row a{font-weight:700;text-decoration:none}
+html[data-theme="retro"] .offer .btn{width:100%}
+
+html[data-theme="retro"] .share-btns{display:flex;gap:8px;flex-wrap:wrap}
+
+/* 넓은 화면 */
+@media (min-width:880px){
+  html[data-theme="retro"] .wrap{max-width:1160px;padding:28px 28px 56px;gap:18px}
+  html[data-theme="retro"] .hero{padding:40px 44px;display:grid;grid-template-columns:1fr auto;align-items:end;column-gap:24px}
+  html[data-theme="retro"] .hero::before{width:420px;height:420px;right:-80px;top:-160px}
+  html[data-theme="retro"] .hero h1{font-size:60px} html[data-theme="retro"] .hero .sub{font-size:28px}
+  html[data-theme="retro"] .hero-actions{flex-direction:column;align-items:flex-end}
+  html[data-theme="retro"] .calc .grid2 .picks{grid-column:1/-1}
+  html[data-theme="retro"] .trip-body .grid2{grid-template-columns:1fr 1fr 1fr 2fr}
+  html[data-theme="retro"] .trip-body .span2{grid-column:auto}
+  html[data-theme="retro"] .tabs{position:static;transform:none;width:auto;height:auto;padding:6px;background:rgba(255,255,255,.85);box-shadow:var(--shadow)}
+  html[data-theme="retro"] .tabs button{flex-direction:row;gap:10px;padding:12px 8px;color:var(--muted)}
+  html[data-theme="retro"] .tabs span{font-size:12.5px}
+  html[data-theme="retro"] .tabs button[aria-selected="true"]{color:#fff}
+  html[data-theme="retro"] .main{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:18px;align-items:start}
+  html[data-theme="retro"] .cart{position:sticky;top:20px;max-height:calc(100vh - 40px);overflow:auto}
+  html[data-theme="retro"] .calc .grid2{grid-template-columns:repeat(4,1fr)}
+  html[data-theme="retro"] .calc .grid2 .span2{grid-column:span 2}
+  html[data-theme="retro"] .items{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  html[data-theme="retro"] .fx{display:grid;grid-template-columns:300px 1fr;align-items:center;gap:28px}
+  html[data-theme="retro"] .big{font-size:72px}
+  html[data-theme="retro"] .verdict .v{font-size:34px}
+  html[data-theme="retro"] .item .save{max-width:170px}
+  html[data-theme="retro"] #p-before{display:grid;grid-template-columns:1fr 1fr;gap:18px;grid-auto-flow:row dense;align-items:start}
+  html[data-theme="retro"] #p-before>.fx,html[data-theme="retro"] #p-before>.prep{grid-column:1/-1}
+  html[data-theme="retro"] .cards{grid-template-columns:repeat(3,1fr)}
+  html[data-theme="retro"] #decl{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  html[data-theme="retro"] #p-after{display:grid;grid-template-columns:3fr 2fr;gap:18px;align-items:start}
+  html[data-theme="retro"] .minibar{display:none}
+  html[data-theme="retro"] .toast{bottom:32px}
+}
+@media (prefers-reduced-motion:reduce){html[data-theme="retro"] .gauge i,html[data-theme="retro"] .toast{transition:none}html[data-theme="retro"] .minibar.is-pulse{animation:none}}
+
+
+/* ===== 레트로 테마 (html[data-theme="retro"]일 때만 적용) ===== */
+
+/* ===================== 레트로 픽셀 테마 · 하늘·바다·민트 =====================
+   모던 v5와 마크업·계산은 같고, 아래 규칙만 덮어써요. 제목·버튼·큰 숫자는 픽셀 글꼴, 본문·입력은 고딕. */
+:root[data-theme="retro"]{
+  --ink:#0B2340; --paper:#E6F5FF; --card:#FBFEFF; --muted:#4A6480; --line:#0B2340; --field:#EEF8FF;
+  --accent:#1E6FE8; --accent-2:#36D1BE; --accent-bg:#DDEFFF; --mint:#9BF0E2; --sky:#A4DDFF;
+  --good:#0C9A73; --good-bg:#DDF8EE; --bad:#E0464E; --bad-bg:#FFE3E5; --warn:#9A5B00; --warn-bg:#FFF1C7; --even:#3F5875; --even-bg:#E6EEF7;
+  --pixel:"Galmuri11","Galmuri9","Pixelify Sans","Orbit","Noto Sans KR",monospace;
+  --display:var(--pixel);
+  --r-xl:0; --r-lg:0; --r-md:0;
+  --bd:3px solid var(--line); --sh:5px 5px 0 var(--line); --sh-sm:3px 3px 0 var(--line);
+  --shadow:var(--sh);
+}
+html[data-theme="retro"] body{letter-spacing:0;background:#DDF1FF;
+  background-image:radial-gradient(rgba(11,35,64,.38) 0.9px,transparent 1.2px),radial-gradient(rgba(11,35,64,.25) 0.7px,transparent 1px);
+  background-size:12px 12px,18px 18px;background-position:0 0,6px 9px}
+html[data-theme="retro"] h1,html[data-theme="retro"] h2,html[data-theme="retro"] h3{letter-spacing:0}
+html[data-theme="retro"] .panel,html[data-theme="retro"] .trip,html[data-theme="retro"] .item{border:var(--bd);box-shadow:var(--sh)}
+html[data-theme="retro"] .wrap{gap:18px}
+
+/* 히어로: 픽셀 하늘·후지산·바다 + 날아가는 비행기 */
+html[data-theme="retro"] .hero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:30px 18px 132px;border:var(--bd);box-shadow:var(--sh);background:var(--sky)}
+html[data-theme="retro"] .hero::before{display:none}
+html[data-theme="retro"] .hero-art{display:block;position:absolute;inset:0;width:100%;height:100%;z-index:0;image-rendering:pixelated}
+html[data-theme="retro"] .hero-plane{display:block;position:absolute;z-index:1;top:6px;right:4px;width:136px;height:auto;image-rendering:pixelated;animation:fly 1.6s steps(2) infinite}
+@keyframes fly{50%{transform:translate(-2px,-3px)}}
+html[data-theme="retro"] .hero>.hero-text,html[data-theme="retro"] .hero>.hero-actions{position:relative;z-index:2}
+html[data-theme="retro"] .hero-actions{justify-content:center}
+html[data-theme="retro"] .pick{border:2px solid var(--line);border-radius:0;background:#fff;font-family:var(--pixel);box-shadow:var(--sh-sm)}
+html[data-theme="retro"] .pick[aria-pressed="true"]{background:var(--accent-2);color:var(--ink)}
+html[data-theme="retro"] .pick:active{transform:translate(3px,3px);box-shadow:none}
+html[data-theme="retro"] .hero-text{display:flex;flex-direction:column;align-items:center;gap:8px}
+html[data-theme="retro"] .hero h1{font-size:44px;line-height:1.1;color:var(--ink);text-shadow:3px 3px 0 #FFFFFF,6px 6px 0 var(--accent-2)}
+html[data-theme="retro"] .hero .sub{font-family:var(--pixel);font-size:17px;font-weight:700;color:#0B3A73;background:none;-webkit-background-clip:border-box;background-clip:border-box}
+html[data-theme="retro"] .hero .sub::after{content:"▮";margin-left:4px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+html[data-theme="retro"] .hero p{margin:4px 0 0;color:var(--ink);font-size:13px;font-weight:500;max-width:44ch;background:rgba(255,255,255,.88);border:2px solid var(--line);box-shadow:var(--sh-sm);padding:8px 12px}
+html[data-theme="retro"] .tag{align-self:center;border-radius:0;background:var(--ink);color:#BFF5EC;font-size:11px;font-weight:700;padding:4px 10px}
+
+/* 입력 */
+html[data-theme="retro"] select,html[data-theme="retro"] input[type=date],html[data-theme="retro"] input[type=number],html[data-theme="retro"] input[type=text],html[data-theme="retro"] textarea{border:2px solid var(--line);border-radius:0;background-color:#fff;box-shadow:inset 2px 2px 0 #D2E6F6}
+html[data-theme="retro"] input:focus,html[data-theme="retro"] select:focus{outline:3px solid var(--accent-2);background-color:#fff}
+html[data-theme="retro"] button:focus-visible,html[data-theme="retro"] input:focus-visible,html[data-theme="retro"] select:focus-visible,html[data-theme="retro"] a:focus-visible,html[data-theme="retro"] summary:focus-visible{outline:3px solid var(--accent-2)}
+html[data-theme="retro"] .field{color:var(--muted)}
+
+/* 버튼 (기본 → 변형 순서) */
+html[data-theme="retro"] .btn{border:2px solid var(--line);border-radius:0;background:#fff;color:var(--ink);font-family:var(--pixel);box-shadow:var(--sh-sm);transition:transform .05s,box-shadow .05s}
+html[data-theme="retro"] .btn:active{transform:translate(3px,3px);box-shadow:none}
+html[data-theme="retro"] .btn-primary{background:var(--accent);color:#fff;border:3px solid var(--line);box-shadow:var(--sh);text-shadow:2px 2px 0 rgba(0,0,0,.25)}
+html[data-theme="retro"] .btn-ghost{background:var(--field)}
+html[data-theme="retro"] .btn-dark{background:var(--ink);color:#fff}
+html[data-theme="retro"] .btn:disabled{box-shadow:none}
+
+/* 칩·안내 (기본 → 변형 순서) */
+html[data-theme="retro"] .chip{border-radius:0;border:2px solid var(--line);background:#fff}
+html[data-theme="retro"] .chip-good{color:var(--good);background:var(--good-bg)} html[data-theme="retro"] .chip-bad{color:var(--bad);background:var(--bad-bg)}
+html[data-theme="retro"] .chip-warn{color:var(--warn);background:var(--warn-bg)} html[data-theme="retro"] .chip-neutral{color:var(--muted);background:#fff} html[data-theme="retro"] .chip-accent{color:#0E4FA8;background:var(--accent-bg)}
+html[data-theme="retro"] .note{border-radius:0;border:2px solid var(--line);background:#fff;color:var(--ink)}
+html[data-theme="retro"] .note-warn{background:var(--warn-bg);color:var(--warn)}
+html[data-theme="retro"] .note-info{background:var(--accent-bg);color:#0E4FA8}
+html[data-theme="retro"] .note-good{background:var(--good-bg);color:#06654B}
+
+/* 여행 설정 */
+html[data-theme="retro"] .trip{border-radius:0}
+html[data-theme="retro"] .trip summary{font-family:var(--pixel)}
+html[data-theme="retro"] .trip .plane{border-radius:0;background:var(--mint);color:var(--ink);border:2px solid var(--line)}
+html[data-theme="retro"] .trip .edit{border-radius:0;background:var(--accent-2);color:var(--ink);border:2px solid var(--line);box-shadow:var(--sh-sm)}
+html[data-theme="retro"] .trip-body{border-top:2px dashed var(--line);padding-top:16px}
+
+/* 탭 */
+html[data-theme="retro"] .tabs{border-radius:0;background:var(--ink);border:3px solid var(--line);box-shadow:5px 5px 0 rgba(11,35,64,.4)}
+html[data-theme="retro"] .tabs button{border-radius:0;color:#BFE3FF;font-family:var(--pixel);border:2px solid transparent}
+html[data-theme="retro"] .tabs button[aria-selected="true"]{background:var(--accent-2);color:var(--ink);border-color:var(--line);box-shadow:inset -3px -3px 0 rgba(0,0,0,.18)}
+
+/* 출국 전 */
+html[data-theme="retro"] .big{color:var(--accent);text-shadow:3px 3px 0 var(--ink)}
+html[data-theme="retro"] svg text{font-family:var(--pixel);fill:var(--muted)}
+html[data-theme="retro"] .sp-line{stroke-linecap:square;stroke-linejoin:miter}
+html[data-theme="retro"] .sp-dot{stroke:var(--ink)}
+html[data-theme="retro"] .sp-now{fill:var(--accent-2);stroke:var(--ink);stroke-width:2}
+html[data-theme="retro"] .wallet{border-radius:0;background:var(--accent);border:var(--bd);box-shadow:var(--sh);outline:3px solid #fff;outline-offset:-9px}
+html[data-theme="retro"] .wallet::after{display:none}
+html[data-theme="retro"] .wallet input{background:#fff;color:var(--ink)}
+html[data-theme="retro"] .wallet input:focus{background:#fff;outline-color:var(--accent-2)}
+html[data-theme="retro"] .wallet .btn{background:var(--accent-2);color:var(--ink)}
+html[data-theme="retro"] .wallet .field,html[data-theme="retro"] .wallet p{color:#E3F1FF}
+
+/* 매장 계산기 */
+html[data-theme="retro"] .verdict{border:3px solid var(--line);outline:3px solid #fff;outline-offset:-9px;box-shadow:var(--sh);padding:22px}
+html[data-theme="retro"] .verdict .v{text-shadow:3px 3px 0 rgba(0,0,0,.22)}
+html[data-theme="retro"] .verdict.is-good{background:var(--good);color:#fff}
+html[data-theme="retro"] .verdict.is-bad{background:var(--bad);color:#fff}
+html[data-theme="retro"] .verdict.is-even{background:#5B7896;color:#fff}
+html[data-theme="retro"] .verdict.is-check{background:#FFCF57;color:var(--ink)}
+html[data-theme="retro"] .verdict.is-good .d,html[data-theme="retro"] .verdict.is-bad .d,html[data-theme="retro"] .verdict.is-even .d,html[data-theme="retro"] .verdict.is-good .d b,html[data-theme="retro"] .verdict.is-bad .d b,html[data-theme="retro"] .verdict.is-even .d b{color:#fff}
+html[data-theme="retro"] .verdict.is-check .d,html[data-theme="retro"] .verdict.is-check .d b{color:var(--ink)}
+html[data-theme="retro"] .verdict.is-check .v{text-shadow:2px 2px 0 #fff}
+html[data-theme="retro"] .verdict .spec{border-radius:0;border:2px solid var(--line);background:#fff;color:var(--warn)}
+html[data-theme="retro"] .money div{border-radius:0;border:2px solid var(--line);background:#fff}
+html[data-theme="retro"] .money .is-final{background:var(--mint)}
+html[data-theme="retro"] .money .is-final b{color:var(--ink)}
+html[data-theme="retro"] .more{border-radius:0;border:2px solid var(--line);background:#fff}
+html[data-theme="retro"] .more summary{font-family:var(--pixel)}
+html[data-theme="retro"] .more summary::after{content:"▼ 열기";font-family:var(--pixel)}
+html[data-theme="retro"] .more[open] summary::after{content:"▲ 닫기"}
+html[data-theme="retro"] .paths{border-radius:0;border:2px dashed var(--line);background:var(--field)}
+html[data-theme="retro"] .path-btn{border-radius:0;border:2px solid var(--line);box-shadow:var(--sh-sm);background:#fff}
+html[data-theme="retro"] .path-btn .t{font-family:var(--pixel)}
+html[data-theme="retro"] .path-btn.is-recommended{background:var(--accent-2);color:var(--ink);box-shadow:var(--sh-sm)}
+html[data-theme="retro"] .path-btn.is-recommended .s{color:#0B3A3A}
+html[data-theme="retro"] .path-btn[aria-disabled="true"]{box-shadow:none;border-style:dashed;background:#F4F8FB}
+
+/* 참고 상품 */
+html[data-theme="retro"] .item{border-radius:0;padding-left:24px}
+html[data-theme="retro"] .item::before{top:0;bottom:0;width:10px;border-radius:0;background:#C5D6E6}
+html[data-theme="retro"] .item.is-good::before{background:var(--good)} html[data-theme="retro"] .item.is-bad::before{background:var(--bad)} html[data-theme="retro"] .item.is-even::before{background:#5B7896} html[data-theme="retro"] .item.is-check::before{background:#FFCF57}
+html[data-theme="retro"] .item .spec{border-radius:0;border:2px solid var(--line)}
+
+/* 쇼핑 리스트 */
+html[data-theme="retro"] .person{border-radius:0;border:2px solid var(--line);background:#fff}
+html[data-theme="retro"] .gauge{border-radius:0;border:2px solid var(--line);background:#fff;height:16px}
+html[data-theme="retro"] .gauge::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 12px,#fff 12px 14px);pointer-events:none}
+html[data-theme="retro"] .gauge i{transition:width .25s steps(6)}
+html[data-theme="retro"] .gauge .g-dfs{background:#9FB4C9}
+html[data-theme="retro"] .gauge .g-shop{background:var(--accent)}
+html[data-theme="retro"] .gauge.is-over .g-shop{background:#FF8A3D}
+html[data-theme="retro"] .seg,html[data-theme="retro"] .qty{border-radius:0;border:2px solid var(--line);background:#fff;padding:0}
+html[data-theme="retro"] .seg button{border-radius:0}
+html[data-theme="retro"] .seg button[aria-pressed="true"]{background:var(--accent-2);color:var(--ink);box-shadow:none}
+html[data-theme="retro"] .line{border-top:2px dashed #B7CCE0}
+html[data-theme="retro"] .line select,html[data-theme="retro"] .dfs-input input{border-radius:0}
+html[data-theme="retro"] .total{color:var(--good);text-shadow:2px 2px 0 var(--ink)}
+html[data-theme="retro"] .total.is-bad{color:var(--bad)}
+
+/* 귀국 전: 영수증 */
+html[data-theme="retro"] .receipt{border-radius:0;border:2px solid var(--line);box-shadow:var(--sh-sm);
+  -webkit-mask:radial-gradient(circle 6px at 50% 100%,transparent 98%,#000) 0 0/16px 100%;mask:radial-gradient(circle 6px at 50% 100%,transparent 98%,#000) 0 0/16px 100%}
+html[data-theme="retro"] .receipt .head{border-bottom:2px dashed var(--line)}
+
+/* 알림·미니 바 */
+html[data-theme="retro"] .toast{border-radius:0;border:3px solid var(--line);background:var(--ink);color:#BFF5EC;box-shadow:var(--sh)}
+html[data-theme="retro"] .minibar{border-radius:0;border:var(--bd);box-shadow:var(--sh)}
+html[data-theme="retro"] .minibar .gauge{height:12px}
+html[data-theme="retro"] .minibar.is-pulse{animation:pop .5s steps(2)}
+@keyframes pop{50%{background:var(--mint)}}
+
+@media (min-width:880px){
+  html[data-theme="retro"] .hero{display:flex;padding:48px 44px 200px}
+  html[data-theme="retro"] .hero-actions{flex-direction:row;align-items:center}
+  html[data-theme="retro"] .hero h1{font-size:78px;text-shadow:4px 4px 0 #FFFFFF,8px 8px 0 var(--accent-2)}
+  html[data-theme="retro"] .hero .sub{font-size:24px}
+  html[data-theme="retro"] .hero p{font-size:14px}
+  html[data-theme="retro"] .hero-plane{width:230px;top:28px;right:7%}
+  html[data-theme="retro"] .tabs{background:var(--ink);box-shadow:var(--sh)}
+  html[data-theme="retro"] .tabs button{color:#BFE3FF}
+  html[data-theme="retro"] .tabs button[aria-selected="true"]{color:var(--ink)}
+  html[data-theme="retro"] .big{text-shadow:4px 4px 0 var(--ink)}
+}
+@media (prefers-reduced-motion:reduce){html[data-theme="retro"] .hero-plane,html[data-theme="retro"] .hero .sub::after,html[data-theme="retro"] .minibar.is-pulse{animation:none}html[data-theme="retro"] .gauge i{transition:none}}
+
+html[data-theme="retro"] .cardtable{border:2px solid var(--line);border-radius:0;background:#fff}html[data-theme="retro"] .ct-row{border-top:2px dashed #B7CCE0}html[data-theme="retro"] .ct-head{background:var(--mint);color:var(--ink);font-family:var(--pixel)}html[data-theme="retro"] .ct-row:first-child{border-top:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <svg class="hero-art" viewBox="0 0 160 80" preserveAspectRatio="xMidYMax slice" shape-rendering="crispEdges" aria-hidden="true"><rect x="0" y="0" width="160" height="14" fill="#D3F0FF"/><rect x="0" y="14" width="160" height="14" fill="#BCE7FF"/><rect x="0" y="28" width="160" height="14" fill="#A4DDFF"/><rect x="0" y="42" width="160" height="14" fill="#8CD2FF"/><rect x="0" y="56" width="160" height="8" fill="#7AC9FF"/><rect x="10" y="12" width="24" height="2" fill="#FFFFFF"/><rect x="13" y="11" width="18" height="1" fill="#FFFFFF"/><rect x="15" y="10" width="12" height="1" fill="#FFFFFF"/><rect x="11" y="14" width="22" height="1" fill="#E2F4FF"/><rect x="116" y="9" width="28" height="2" fill="#FFFFFF"/><rect x="119" y="8" width="22" height="1" fill="#FFFFFF"/><rect x="121" y="7" width="16" height="1" fill="#FFFFFF"/><rect x="117" y="11" width="26" height="1" fill="#E2F4FF"/><rect x="62" y="22" width="14" height="2" fill="#FFFFFF"/><rect x="65" y="21" width="8" height="1" fill="#FFFFFF"/><rect x="67" y="20" width="2" height="1" fill="#FFFFFF"/><rect x="63" y="24" width="12" height="1" fill="#E2F4FF"/><rect x="138" y="30" width="16" height="2" fill="#FFFFFF"/><rect x="141" y="29" width="10" height="1" fill="#FFFFFF"/><rect x="143" y="28" width="4" height="1" fill="#FFFFFF"/><rect x="139" y="32" width="14" height="1" fill="#E2F4FF"/><rect x="30" y="34" width="12" height="2" fill="#FFFFFF"/><rect x="33" y="33" width="6" height="1" fill="#FFFFFF"/><rect x="35" y="32" width="2" height="1" fill="#FFFFFF"/><rect x="31" y="36" width="10" height="1" fill="#E2F4FF"/><rect x="0" y="58" width="4" height="6" fill="#6BB8E6"/><rect x="4" y="55" width="4" height="9" fill="#6BB8E6"/><rect x="8" y="53" width="4" height="11" fill="#6BB8E6"/><rect x="12" y="53" width="4" height="11" fill="#6BB8E6"/><rect x="16" y="54" width="4" height="10" fill="#6BB8E6"/><rect x="20" y="56" width="4" height="8" fill="#6BB8E6"/><rect x="24" y="58" width="4" height="6" fill="#6BB8E6"/><rect x="28" y="58" width="4" height="6" fill="#6BB8E6"/><rect x="32" y="58" width="4" height="6" fill="#6BB8E6"/><rect x="36" y="58" width="4" height="6" fill="#6BB8E6"/><rect x="40" y="58" width="4" height="6" fill="#6BB8E6"/><rect x="44" y="58" width="4" height="6" fill="#6BB8E6"/><rect x="48" y="60" width="4" height="4" fill="#6BB8E6"/><rect x="52" y="63" width="4" height="1" fill="#6BB8E6"/><rect x="56" y="64" width="4" height="0" fill="#6BB8E6"/><rect x="60" y="63" width="4" height="1" fill="#6BB8E6"/><rect x="64" y="61" width="4" height="3" fill="#6BB8E6"/><rect x="68" y="58" width="4" height="6" fill="#6BB8E6"/><rect x="72" y="55" width="4" height="9" fill="#6BB8E6"/><rect x="76" y="53" width="4" height="11" fill="#6BB8E6"/><rect x="80" y="53" width="4" height="11" fill="#6BB8E6"/><rect x="84" y="55" width="4" height="9" fill="#6BB8E6"/><rect x="88" y="57" width="4" height="7" fill="#6BB8E6"/><rect x="92" y="58" width="4" height="6" fill="#6BB8E6"/><rect x="96" y="58" width="4" height="6" fill="#6BB8E6"/><rect x="100" y="57" width="4" height="7" fill="#6BB8E6"/><rect x="104" y="57" width="4" height="7" fill="#6BB8E6"/><rect x="108" y="57" width="4" height="7" fill="#6BB8E6"/><rect x="112" y="58" width="4" height="6" fill="#6BB8E6"/><rect x="116" y="61" width="4" height="3" fill="#6BB8E6"/><rect x="120" y="63" width="4" height="1" fill="#6BB8E6"/><rect x="124" y="64" width="4" height="0" fill="#6BB8E6"/><rect x="128" y="63" width="4" height="1" fill="#6BB8E6"/><rect x="132" y="60" width="4" height="4" fill="#6BB8E6"/><rect x="136" y="58" width="4" height="6" fill="#6BB8E6"/><rect x="140" y="55" width="4" height="9" fill="#6BB8E6"/><rect x="144" y="54" width="4" height="10" fill="#6BB8E6"/><rect x="148" y="54" width="4" height="10" fill="#6BB8E6"/><rect x="152" y="56" width="4" height="8" fill="#6BB8E6"/><rect x="156" y="57" width="4" height="7" fill="#6BB8E6"/><rect x="78" y="38" width="4" height="1" fill="#F4FBFF"/><rect x="77" y="39" width="6" height="1" fill="#F4FBFF"/><rect x="75" y="40" width="10" height="1" fill="#F4FBFF"/><rect x="74" y="41" width="12" height="1" fill="#F4FBFF"/><rect x="72" y="42" width="16" height="1" fill="#F4FBFF"/><rect x="71" y="43" width="18" height="1" fill="#F4FBFF"/><rect x="69" y="44" width="22" height="1" fill="#F4FBFF"/><rect x="68" y="45" width="24" height="1" fill="#4F86D6"/><rect x="68" y="45" width="4" height="1" fill="#3E70BE"/><rect x="66" y="46" width="28" height="1" fill="#4F86D6"/><rect x="66" y="46" width="4" height="1" fill="#3E70BE"/><rect x="65" y="47" width="30" height="1" fill="#4F86D6"/><rect x="65" y="47" width="5" height="1" fill="#3E70BE"/><rect x="63" y="48" width="34" height="1" fill="#4F86D6"/><rect x="63" y="48" width="5" height="1" fill="#3E70BE"/><rect x="61" y="49" width="38" height="1" fill="#4F86D6"/><rect x="61" y="49" width="6" height="1" fill="#3E70BE"/><rect x="60" y="50" width="40" height="1" fill="#4F86D6"/><rect x="60" y="50" width="6" height="1" fill="#3E70BE"/><rect x="58" y="51" width="44" height="1" fill="#4F86D6"/><rect x="58" y="51" width="7" height="1" fill="#3E70BE"/><rect x="57" y="52" width="46" height="1" fill="#4F86D6"/><rect x="57" y="52" width="7" height="1" fill="#3E70BE"/><rect x="55" y="53" width="50" height="1" fill="#4F86D6"/><rect x="55" y="53" width="8" height="1" fill="#3E70BE"/><rect x="54" y="54" width="52" height="1" fill="#4F86D6"/><rect x="54" y="54" width="8" height="1" fill="#3E70BE"/><rect x="52" y="55" width="56" height="1" fill="#4F86D6"/><rect x="52" y="55" width="9" height="1" fill="#3E70BE"/><rect x="51" y="56" width="58" height="1" fill="#4F86D6"/><rect x="51" y="56" width="9" height="1" fill="#3E70BE"/><rect x="49" y="57" width="62" height="1" fill="#4F86D6"/><rect x="49" y="57" width="10" height="1" fill="#3E70BE"/><rect x="47" y="58" width="66" height="1" fill="#4F86D6"/><rect x="47" y="58" width="11" height="1" fill="#3E70BE"/><rect x="46" y="59" width="68" height="1" fill="#4F86D6"/><rect x="46" y="59" width="11" height="1" fill="#3E70BE"/><rect x="44" y="60" width="72" height="1" fill="#4F86D6"/><rect x="44" y="60" width="12" height="1" fill="#3E70BE"/><rect x="43" y="61" width="74" height="1" fill="#4F86D6"/><rect x="43" y="61" width="12" height="1" fill="#3E70BE"/><rect x="41" y="62" width="78" height="1" fill="#4F86D6"/><rect x="41" y="62" width="13" height="1" fill="#3E70BE"/><rect x="40" y="63" width="80" height="1" fill="#4F86D6"/><rect x="40" y="63" width="13" height="1" fill="#3E70BE"/><rect x="74" y="45" width="3" height="2" fill="#F4FBFF"/><rect x="78" y="45" width="3" height="3" fill="#F4FBFF"/><rect x="83" y="45" width="3" height="2" fill="#F4FBFF"/><rect x="87" y="45" width="3" height="1" fill="#F4FBFF"/><rect x="0" y="64" width="160" height="6" fill="#6FE3D2"/><rect x="0" y="70" width="160" height="5" fill="#42CDBF"/><rect x="0" y="75" width="160" height="5" fill="#22AEA8"/><rect x="8" y="66" width="5" height="1" fill="#FFFFFF" opacity="0.85"/><rect x="13" y="65" width="2" height="1" fill="#FFFFFF" opacity="0.6"/><rect x="30" y="68" width="5" height="1" fill="#FFFFFF" opacity="0.85"/><rect x="35" y="67" width="2" height="1" fill="#FFFFFF" opacity="0.6"/><rect x="52" y="66" width="5" height="1" fill="#FFFFFF" opacity="0.85"/><rect x="57" y="65" width="2" height="1" fill="#FFFFFF" opacity="0.6"/><rect x="96" y="67" width="5" height="1" fill="#FFFFFF" opacity="0.85"/><rect x="101" y="66" width="2" height="1" fill="#FFFFFF" opacity="0.6"/><rect x="120" y="66" width="5" height="1" fill="#FFFFFF" opacity="0.85"/><rect x="125" y="65" width="2" height="1" fill="#FFFFFF" opacity="0.6"/><rect x="142" y="68" width="5" height="1" fill="#FFFFFF" opacity="0.85"/><rect x="147" y="67" width="2" height="1" fill="#FFFFFF" opacity="0.6"/><rect x="18" y="72" width="5" height="1" fill="#FFFFFF" opacity="0.85"/><rect x="23" y="71" width="2" height="1" fill="#FFFFFF" opacity="0.6"/><rect x="70" y="72" width="5" height="1" fill="#FFFFFF" opacity="0.85"/><rect x="75" y="71" width="2" height="1" fill="#FFFFFF" opacity="0.6"/><rect x="110" y="73" width="5" height="1" fill="#FFFFFF" opacity="0.85"/><rect x="115" y="72" width="2" height="1" fill="#FFFFFF" opacity="0.6"/><rect x="150" y="72" width="5" height="1" fill="#FFFFFF" opacity="0.85"/><rect x="155" y="71" width="2" height="1" fill="#FFFFFF" opacity="0.6"/><rect x="40" y="77" width="5" height="1" fill="#FFFFFF" opacity="0.85"/><rect x="45" y="76" width="2" height="1" fill="#FFFFFF" opacity="0.6"/><rect x="88" y="77" width="5" height="1" fill="#FFFFFF" opacity="0.85"/><rect x="93" y="76" width="2" height="1" fill="#FFFFFF" opacity="0.6"/><rect x="132" y="77" width="5" height="1" fill="#FFFFFF" opacity="0.85"/><rect x="137" y="76" width="2" height="1" fill="#FFFFFF" opacity="0.6"/></svg>
+    <svg class="hero-plane" viewBox="0 0 64 14" shape-rendering="crispEdges" aria-hidden="true"><rect x="0" y="7" width="4" height="1" fill="#FFFFFF" opacity="0.35"/><rect x="3" y="8" width="4" height="1" fill="#FFFFFF" opacity="0.30"/><rect x="6" y="7" width="4" height="1" fill="#FFFFFF" opacity="0.45"/><rect x="9" y="8" width="4" height="1" fill="#FFFFFF" opacity="0.40"/><rect x="12" y="7" width="4" height="1" fill="#FFFFFF" opacity="0.55"/><rect x="15" y="8" width="4" height="1" fill="#FFFFFF" opacity="0.50"/><rect x="18" y="7" width="4" height="1" fill="#FFFFFF" opacity="0.65"/><rect x="21" y="8" width="4" height="1" fill="#FFFFFF" opacity="0.60"/><rect x="24" y="7" width="4" height="1" fill="#FFFFFF" opacity="0.75"/><rect x="27" y="8" width="4" height="1" fill="#FFFFFF" opacity="0.70"/><rect x="30" y="7" width="4" height="1" fill="#FFFFFF" opacity="0.85"/><rect x="33" y="8" width="4" height="1" fill="#FFFFFF" opacity="0.80"/><rect x="38" y="2" width="3" height="1" fill="#1E6FE8"/><rect x="38" y="3" width="4" height="1" fill="#1E6FE8"/><rect x="38" y="4" width="5" height="1" fill="#1E6FE8"/><rect x="49" y="3" width="4" height="1" fill="#CDE8FF"/><rect x="50" y="2" width="2" height="1" fill="#CDE8FF"/><rect x="42" y="4" width="16" height="1" fill="#0B2340"/><rect x="58" y="5" width="1" height="1" fill="#0B2340"/><rect x="59" y="6" width="1" height="1" fill="#0B2340"/><rect x="37" y="5" width="1" height="4" fill="#0B2340"/><rect x="38" y="5" width="20" height="4" fill="#FFFFFF"/><rect x="58" y="6" width="1" height="2" fill="#FFFFFF"/><rect x="59" y="7" width="1" height="1" fill="#FFFFFF"/><rect x="60" y="7" width="1" height="1" fill="#0B2340"/><rect x="59" y="8" width="1" height="1" fill="#0B2340"/><rect x="43" y="6" width="1" height="1" fill="#1E6FE8"/><rect x="45" y="6" width="1" height="1" fill="#1E6FE8"/><rect x="47" y="6" width="1" height="1" fill="#1E6FE8"/><rect x="49" y="6" width="1" height="1" fill="#1E6FE8"/><rect x="51" y="6" width="1" height="1" fill="#1E6FE8"/><rect x="53" y="6" width="1" height="1" fill="#1E6FE8"/><rect x="56" y="6" width="2" height="1" fill="#0B2340"/><rect x="39" y="8" width="19" height="1" fill="#36D1BE"/><rect x="38" y="9" width="21" height="1" fill="#0B2340"/><rect x="46" y="10" width="7" height="1" fill="#CDE8FF"/><rect x="45" y="11" width="6" height="1" fill="#CDE8FF"/><rect x="44" y="12" width="5" height="1" fill="#0B2340"/><rect x="49" y="10" width="3" height="1" fill="#0B2340"/></svg>
+    <div class="stack-sm hero-text">
+      <h1>환율타이밍</h1>
+      <span class="sub">일본 매장 3초 쇼핑 판정기</span>
+      <p>출국 전엔 엔화 타이밍, 매장에선 "이거 한국보다 싸?", 귀국 전엔 세관 신고까지. 앱 설치 없이 링크만 열면 바로 써요.</p>
+    </div>
+    <div class="hero-actions">
+      <span class="tag">PLAF 프로토타입 v5 · 데모 데이터</span>
+      <button class="btn btn-sm theme-btn" type="button" id="theme-btn">디자인 바꾸기</button>
+    </div>
+  </header>
+
+  <details class="trip" id="trip">
+    <summary><span class="plane" aria-hidden="true">✈</span><span id="trip-sum"></span><span class="edit" aria-hidden="true"></span></summary>
+    <div class="trip-body">
+      <div class="grid2">
+        <label class="field">여행지
+          <select id="city"><option>오사카</option><option>도쿄</option><option>후쿠오카</option><option>삿포로</option></select>
+        </label>
+        <label class="field">출발일
+          <input id="date" type="date">
+        </label>
+        <label class="field">며칠 머물러요? (박)
+          <input id="nights" type="number" min="1" max="30" step="1" inputmode="numeric">
+        </label>
+        <label class="field span2">함께 가는 인원 (1인당 $800, 합산 안 됨)
+          <input id="people" type="number" min="1" max="6" step="1" inputmode="numeric">
+        </label>
+        <label class="field span2">오늘 엔화 환율 (원/100엔) <span class="hint" id="jpy-val"></span>
+          <input id="jpy" type="range" min="700" max="1000" step="1">
+        </label>
+        <label class="field">원/달러 (세관 $800 환산용) <span class="hint" id="usd-val"></span>
+          <input id="usd" type="number" min="1000" max="2000" step="0.1" inputmode="decimal">
+        </label>
+        <div class="stack-sm fx-box">
+          <button class="btn btn-sm" type="button" id="fx-refresh">실시간 환율 다시 받기</button>
+          <span class="muted tiny" id="fx-status" aria-live="polite"></span>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <nav class="tabs" role="tablist" aria-label="여행 단계">
+    <button role="tab" id="tab-before" aria-controls="p-before" aria-selected="false"><b>① 출국 전</b><span>환전 타이밍 · 여행 준비</span></button>
+    <button role="tab" id="tab-during" aria-controls="p-during" aria-selected="true"><b>② 쇼핑 중</b><span>매장 계산기 · 면세 한도</span></button>
+    <button role="tab" id="tab-after" aria-controls="p-after" aria-selected="false"><b>③ 귀국 전</b><span>세관 신고 정리</span></button>
+  </nav>
+
+  <!-- ① 출국 전 -->
+  <section class="tabpanel" id="p-before" role="tabpanel" aria-labelledby="tab-before" hidden>
+    <section class="panel fx" aria-labelledby="fx-title">
+      <div class="stack-sm">
+        <h2 id="fx-title" class="muted small">원/100엔 환율</h2>
+        <div class="big" id="fx-big"></div>
+        <p class="muted small" id="fx-src"></p>
+        <div class="between"><span class="chip chip-good" id="fx-chg"></span><span class="chip chip-neutral">10월 840원대 · 18년 만의 최저</span></div>
+        <p class="muted small" id="dday"></p>
+      </div>
+      <svg id="spark" viewBox="0 0 520 140" width="100%" role="img" aria-label="2026년 7월부터 11월까지 원/100엔 환율 추이"></svg>
+    </section>
+
+    <section class="panel stack" aria-labelledby="ex-title">
+      <h2 id="ex-title">환전 계산과 알림</h2>
+      <div class="grid2">
+        <label class="field">바꿀 엔화
+          <input id="ex-yen" type="number" min="0" step="1000" inputmode="numeric">
+        </label>
+        <label class="field">목표 환율 (100엔당, 원 이하)
+          <input id="alert-jpy" type="number" min="500" max="1500" step="1" inputmode="numeric">
+        </label>
+        <button class="btn span2" type="button" id="alert-btn"></button>
+      </div>
+      <div class="stack-sm">
+        <div class="row"><span>오늘 환율로 필요한 원화</span><b id="ex-now"></b></div>
+        <div class="row"><span>7월(899원)에 바꿨다면</span><b id="ex-jul"></b></div>
+      </div>
+      <p class="muted small" id="alert-msg"></p>
+      <div class="wallet stack">
+        <div class="between"><h3>내 지갑 환율</h3><span class="chip chip-accent">환전 기록</span></div>
+        <p class="small">이미 환전했다면 매장에서 실제로 내는 돈은 <b>내가 바꾼 환율</b>로 계산돼요. 환전한 엔화를 다 쓰면 나머지는 카드 결제로 보고 오늘 환율을 써요. 면세 한도와 세금은 세관이 공식 환율로 계산해서 지갑 환율과 상관없어요.</p>
+        <div class="grid2">
+          <label class="field">환전한 엔화
+            <input id="w-yen" type="number" min="0" step="1000" inputmode="numeric">
+          </label>
+          <label class="field">낸 원화
+            <input id="w-krw" type="number" min="0" step="1000" inputmode="numeric">
+          </label>
+          <button class="btn span2" type="button" id="w-fill">예시: 10월(840원)에 10만 엔 바꾼 걸로 채우기</button>
+        </div>
+        <div class="row"><span>내 지갑 환율</span><b id="w-rate"></b></div>
+      </div>
+    </section>
+
+    <section class="panel stack" aria-labelledby="share-title">
+      <h2 id="share-title">친구에게 공유할 TOP 5</h2>
+      <textarea id="share-text" rows="7" readonly aria-label="공유용 텍스트"></textarea>
+      <div class="between"><span class="share-btns"><button class="btn" type="button" id="share-btn">카톡·메신저로 공유</button><button class="btn btn-ghost" type="button" id="copy-btn">텍스트 복사</button></span><span class="muted small" id="copy-msg"></span></div>
+    </section>
+
+    <section class="prep stack" aria-labelledby="prep-title">
+      <div class="between"><h2 id="prep-title">여행 준비 연결</h2><span class="chip chip-accent">실제 링크 · 제휴 아님</span></div>
+      <p class="muted small" id="prep-sum"></p>
+      <div class="cards">
+        <article class="panel offer stack">
+          <h3>트래블카드·환전</h3>
+          <div class="cardtable" role="table" aria-label="트래블카드 비교">
+            <div class="ct-row ct-head" role="row"><span role="columnheader">카드</span><span role="columnheader">엔화 환전</span><span role="columnheader">연결 계좌</span><span role="columnheader">일본 ATM</span></div>
+            <div class="ct-row" role="row"><a role="cell" href="https://www.hanacard.co.kr/" target="_blank" rel="noopener">하나 트래블로그 ↗</a><span role="cell">무료</span><span role="cell">하나은행</span><span role="cell">세븐뱅크 무료</span></div>
+            <div class="ct-row" role="row"><a role="cell" href="https://www.travel-wallet.com/" target="_blank" rel="noopener">트래블월렛 ↗</a><span role="cell">무료</span><span role="cell">모든 은행</span><span role="cell">제휴 ATM 월 $2,000까지 무료</span></div>
+            <div class="ct-row" role="row"><a role="cell" href="https://www.shinhancard.com/" target="_blank" rel="noopener">신한 SOL트래블 ↗</a><span role="cell">무료</span><span role="cell">신한은행</span><span role="cell">카드사 확인</span></div>
+            <div class="ct-row" role="row"><a role="cell" href="https://www.tossbank.com/" target="_blank" rel="noopener">토스뱅크 외화통장 ↗</a><span role="cell">무료</span><span role="cell">토스뱅크</span><span role="cell">수수료 붙을 수 있음</span></div>
+          </div>
+          <p class="muted tiny">2026.11 비교 기사 기준. 조건이 자주 바뀌니 발급 전 카드사 공식 안내를 확인하세요. 매장에서 결제할 때는 원화 말고 <b>엔화(JPY)</b>로 결제해야 이중 환전 수수료가 안 붙어요.</p>
+          <p class="note note-info" id="prep-fx"></p>
+        </article>
+        <article class="panel offer stack">
+          <h3>숙소·항공</h3>
+          <p class="small" id="prep-trip"></p>
+          <a class="btn" id="prep-hotel" target="_blank" rel="noopener" href="https://www.booking.com/">숙소 검색 · Booking.com ↗</a>
+          <a class="btn" id="prep-flight" target="_blank" rel="noopener" href="https://www.google.com/travel/flights">항공권 검색 · Google 항공편 ↗</a>
+          <p class="muted tiny">여행지·날짜·인원을 채운 검색 결과로 바로 열려요. 가격은 사이트에서 확인하세요.</p>
+        </article>
+        <article class="panel offer stack">
+          <h3>eSIM·데이터</h3>
+          <p class="small" id="prep-esim"></p>
+          <a class="btn" target="_blank" rel="noopener" href="https://www.airalo.com/japan-esim">Airalo 일본 eSIM ↗</a>
+          <p class="muted tiny">eSIM은 최신 휴대폰만 돼요. 설정에서 eSIM 지원 여부를 먼저 확인하고, 통신사 로밍 요금과 비교해 보세요.</p>
+        </article>
+      </div>
+      <p class="note">지금 링크는 모두 <b>일반 링크</b>라 이 앱이 받는 수수료가 없어요. 나중에 제휴 링크로 바꾸면 "제휴 링크" 표시를 붙일 거예요. 판정 계산에는 제휴를 섞지 않아요.</p>
+    </section>
+  </section>
+
+  <!-- ② 쇼핑 중 -->
+  <section class="tabpanel" id="p-during" role="tabpanel" aria-labelledby="tab-during">
+    <div class="main">
+      <div class="stack">
+        <section class="panel calc stack" aria-labelledby="calc-title">
+          <div class="between"><h2 id="calc-title">이거, 한국보다 싸요?</h2><button class="btn btn-sm btn-ghost" type="button" id="c-reset">새로 계산</button></div>
+          <div class="grid2 calc-main">
+            <label class="field span2">① 상품 <span class="hint" id="c-match"></span>
+              <input id="c-name" type="text" autocomplete="off" list="c-names" value="소니 WH-1000XM6" placeholder="목록에서 정확한 모델을 고르세요">
+              <datalist id="c-names"></datalist>
+            </label>
+            <div class="picks span2" id="c-picks" role="group" aria-label="등록 상품 빠르게 고르기"></div>
+            <label class="field">② 가격표 (엔) <span class="hint" id="c-yen-src"></span>
+              <input id="c-yen" type="number" min="0" max="10000000" step="10" inputmode="numeric" value="59400">
+            </label>
+            <label class="field">한국 가격 (원) <span class="hint" id="c-kr-src"></span>
+              <input id="c-kr" type="number" min="0" max="100000000" step="1000" inputmode="numeric" value="619000" placeholder="국내 판매가">
+            </label>
+          </div>
+          <p class="note note-warn" id="c-suggest" hidden></p>
+          <div class="verdict" id="c-verdict" aria-live="polite"></div>
+          <div class="money" id="c-money"></div>
+          <p class="muted small" id="c-break"></p>
+          <p class="note note-info" id="c-combo" hidden></p>
+          <p class="note note-info" id="c-coupon-save" hidden></p>
+          <details class="more" id="c-more">
+            <summary><b>상세 조건</b><span class="muted small" id="c-more-sum"></span></summary>
+            <div class="stack">
+              <div class="grid2">
+                <label class="field">매장 <select id="c-store"></select></label>
+                <label class="field">종류 <select id="c-cat"></select></label>
+                <label class="field">수량
+                  <input id="c-qty" type="number" min="1" max="99" step="1" inputmode="numeric" value="1">
+                </label>
+                <label class="field" id="c-ml-wrap" hidden>용량 (ml, 1개당)
+                  <input id="c-ml" type="number" min="0" max="5000" step="10" inputmode="numeric" value="700">
+                </label>
+                <label class="field">매장 쿠폰 (%, 0~30)
+                  <input id="c-coupon" type="number" min="0" max="30" step="1" inputmode="numeric" value="0">
+                </label>
+                <label class="field">환급 수수료 (소비세액의 %)
+                  <input id="c-feepct" type="number" min="0" max="50" step="0.5" inputmode="decimal" value="0">
+                </label>
+                <label class="field span2" id="c-person-wrap">누가 쓸 물건? <select id="c-person"></select></label>
+              </div>
+              <label class="toggle"><input type="checkbox" id="c-taxfree" checked><span>면세(택스프리) 매장이에요 <span class="muted small">· 같은 날 이 매장 세전 합계 ¥5,000 이상이면 출국 때 소비세를 돌려받아요</span></span></label>
+              <label class="toggle"><input type="checkbox" id="c-wallet"><span>내 지갑 환율로 계산 <span class="muted small" id="c-wallet-info"></span></span></label>
+              <p class="muted small" id="c-rule"></p>
+              <p class="muted small" id="c-taxclass"></p>
+              <a class="btn btn-ghost btn-sm" id="c-naver" target="_blank" rel="noopener" href="https://search.shopping.naver.com/">네이버 쇼핑에서 국내 판매가 확인 ↗</a>
+            </div>
+          </details>
+          <div class="paths stack">
+            <b class="small">어디서 사든 바로 이어서</b>
+            <div class="path-btns" id="c-paths"></div>
+            <p class="muted tiny">판정과 상관없이 두 경로를 같이 보여줘요.</p>
+          </div>
+          <button class="btn btn-primary" type="button" id="c-add">리스트에 담기</button>
+          <p class="muted small" id="c-msg" aria-live="polite"></p>
+        </section>
+
+        <section class="stack" aria-labelledby="list-title">
+          <div class="between"><h2 id="list-title">많이 사 오는 물건</h2><span class="chip chip-neutral">등록 기준가 · 매장마다 달라요</span></div>
+          <p class="muted small">등록 기준가로 혼자 샀을 때를 계산했어요. 매장 가격은 다를 수 있어요.</p>
+          <div class="items" id="items"></div>
+        </section>
+      </div>
+
+      <aside class="panel cart stack" aria-labelledby="cart-title">
+        <div class="between"><h2 id="cart-title">내 쇼핑 리스트</h2><button class="btn btn-sm" type="button" id="opt-btn">일본·한국 나눠 사기 비교</button></div>
+        <p class="muted small" id="opt-hint">물건마다 일본·한국 중 어디서 살지 고를 수 있어요. 비교 버튼은 지금 리스트 안에서만 골라요.</p>
+        <div class="stack" id="persons"></div>
+        <div class="stack-sm" id="cart-empty">
+          <p class="muted small">계산기나 참고 상품에서 "담기"를 누르면 사람별 면세 한도와 세금을 계산해요.</p>
+          <button class="btn btn-ghost btn-sm" type="button" id="sample-btn">예시로 채워 보기</button>
+        </div>
+        <div class="stack-sm" id="cart-body" hidden>
+          <button class="btn btn-sm" type="button" id="cart-share">일행에게 리스트 보내기 (카톡·메신저)</button>
+          <label class="toggle"><input type="checkbox" id="declare"> 초과분 자진신고 (간이세율 세액의 30% 감면, 1인 최대 20만 원)</label>
+          <p class="small"><b>일본에서 살 것</b> <span class="muted" id="t-jp-n"></span></p>
+          <div class="row"><span>매장에서 먼저 결제</span><b id="t-paid"></b></div>
+          <div class="row"><span>출국 때 예상 환급</span><b id="t-refund"></b></div>
+          <div class="row"><span>환급 후 실제 부담</span><b id="t-pay"></b></div>
+          <div class="row"><span>이 리스트 때문에 늘어나는 입국 세금</span><b id="t-tax"></b></div>
+          <div class="row"><span>전체 예상 입국 세금 (면세점 구매 포함)</span><b id="t-tax-all"></b></div>
+          <div class="row"><span>같은 물건의 국내 기준가</span><b id="t-kr"></b></div>
+          <p class="muted small" id="t-kr-only"></p>
+          <p class="muted small">국내 기준가 대비 예상 차액</p>
+          <div class="total" id="t-saved"></div>
+          <p class="note note-warn" id="t-unknown" hidden>주류·향수 별도 한도를 넘어 계산하지 못한 세금이 있어요. 위 차액은 그 세금을 빼기 전 값이라 확정값이 아니에요. 관세청 여행자 휴대품 예상세액 조회로 확인하세요.</p>
+        </div>
+        <p class="note note-warn">면세 한도는 가족이라도 1인당 $800이고 합산되지 않아요. 출국장 면세점에서 산 것도 같은 한도에 들어가요. 남의 물건을 대신 들고 오면 대리반입으로 처벌받을 수 있어요.</p>
+        <p class="note">이 앱은 <b>내가 쓸 물건</b>을 비교하는 도구예요. 원래 살 계획이 없던 물건을 더 사는 건 절약이 아니라 지출이에요. 되팔 목적으로 면세 반입하면 관세법 위반이에요.</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ③ 귀국 전 -->
+  <section class="tabpanel" id="p-after" role="tabpanel" aria-labelledby="tab-after" hidden>
+    <section class="panel stack" aria-labelledby="decl-title">
+      <h2 id="decl-title">세관 신고 정리</h2>
+      <p class="muted small">쇼핑 리스트와 면세점 구매액을 합쳐서 사람별로 신고할지, 세금이 얼마인지 정리해요.</p>
+      <div class="stack" id="decl"></div>
+    </section>
+    <section class="panel stack checklist" aria-labelledby="ck-title">
+      <h2 id="ck-title">출국·귀국 체크리스트</h2>
+      <label><input type="checkbox"> 택스프리 영수증과 여권 챙기기. 11월부터 매장에선 소비세까지 내고, 구매일부터 90일 안에 출국할 때 세관 확인을 받아야 환급돼요.</label>
+      <label><input type="checkbox"> 영수증 한 장에 든 물건은 전부 가지고 나가기. 하나라도 없으면 그 영수증 전체가 환급 안 돼요.</label>
+      <label><input type="checkbox"> 환급 받을 물건은 위탁 수하물로 맡기기 전에 공항 세관 키오스크에서 확인받기</label>
+      <label><input type="checkbox"> 한도를 넘었다면 기내에서 여행자 휴대품 신고서 작성하기</label>
+      <label><input type="checkbox"> 술(2L·$400)과 향수(100ml)는 일반 물건과 별도 한도라 따로 확인하기</label>
+      <p class="note">올해 7월부터 바뀐 것: 자진신고한 물건을 세금 내기 전에 반품하면 세관에 부과 취소를 신청할 수 있어요. 기본 면세범위 안의 면세품은 다시 출국하지 않아도 국내에서 같은 물건으로 교환할 수 있어요.</p>
+    </section>
+  </section>
+
+  <details class="panel sources">
+    <summary id="src">계산 근거와 출처</summary>
+    <ul>
+      <li>일본가(소비세 포함): 맥북 에어 13 M5 ¥184,800 (<a href="https://www.itmedia.co.jp/news/spv/2603/03/news164.html">ITmedia</a>) · WH-1000XM6 ¥59,400 (<a href="https://www.sony.jp/headphone/products/WH-1000XM6">소니스토어</a>) · WF-1000XM6 ¥44,550 (<a href="https://av.watch.impress.co.jp/docs/news/2089285.html">AV Watch</a>) · X100VI ¥315,700 (<a href="https://www.cined.com/jp/fujifilm-raises-camera-prices-in-japan-by-up-to-15-gfx100-ii-x100vi-and-x-e5-affected/">CineD</a>) · 트립트랩 체어 ¥34,980 (<a href="https://kakaku.com/item/J0000015005/">가격.com 최저가</a>) · 오니츠카타이거 멕시코66 ¥14,300 (<a href="https://kakaku.com/item/S0000723978/">가격.com</a>) · 아이폰 17 256GB ¥159,800 (<a href="https://pc.watch.impress.co.jp/docs/news/2139807.html">PC Watch</a>) · 닌텐도 스위치2 일본어 전용판 ¥49,980 (<a href="https://mobile.newsis.com/view/NISX20250403_0003125365">뉴시스</a>) · 산토리 가쿠빈 700ml ¥2,101 (<a href="https://www.gqkorea.co.kr/?p=410603">GQ</a>)</li>
+      <li>국내가: 맥북 에어 219만 원 (<a href="https://wikidocs.net/blog/@openwiki/32679/">보도</a>) · WH-1000XM6 61.9만 원 (<a href="https://www.mt.co.kr/tech/2026/08/04/2026080409271849306">머니투데이</a>) · WF-1000XM6 49.9만 원 (<a href="https://www.insight.co.kr/news/543960">인사이트</a>) · X100VI 239.9만 원 (<a href="https://biz.sbs.co.kr/amp/article/20000338077">SBS Biz</a>) · 트립트랩 43만 원 (<a href="https://economist.co.kr/article/view/ecn202609170042">이코노미스트</a>) · 멕시코66 196,000원 (<a href="https://www.wishbucket.io/items/3732761">가격 추적</a>) · 아이폰 17 1,287,000원 (<a href="https://pickle.plus/blog/iphone17-price-comparison">보도</a>) · 스위치2 75.8만 원 (<a href="https://www.invenglobal.com/articles/23231/nintendo-switch-2-to-cost-758k-starting-september-1-a-169-price-hike">9/1 인상</a>) · 가쿠빈 47,500원 (<a href="https://m.kihya.com/board/review_list.php?goodsNo=1000020622">키햐</a>)</li>
+      <li>참고 상품: 어느 매장인지 정해지지 않아 한 줄씩 따로 환급 조건(세전 ¥5,000)을 따져요. 같은 매장 물건을 합쳐 보려면 계산기에서 매장을 고르고 담으세요.</li>
+      <li>가격의 성격: 공식가·가격비교 최저가·보도 가격·판매가가 섞여 있어 상품마다 출처와 확인 시점(2026.11)을 함께 표시해요. 매장 가격은 다를 수 있어 계산기에는 눈앞의 가격표를 넣어요.</li>
+      <li>매장 쿠폰: 빅카메라 카메라·뷰티가전·시계 7%, 의약품·화장품·과자 5%, 주류 3%, 애플·게임기 제외, 면세 후 ¥5,000 이상 (<a href="https://livejapan.com/public/operation/coupon/biccamera/ko.html">LIVE JAPAN 빅카메라 쿠폰</a>) · 돈키호테 1회 결제 세전 ¥10,000 이상 5%, ¥30,000 이상 7%, 주류·게임기 본체·애플·단품 ¥100,000 이상 제외 (<a href="https://livejapan.com/public/operation/coupon/donki/ko.html">LIVE JAPAN 돈키호테 쿠폰</a>). 쿠폰 조건은 자주 바뀌어요.</li>
+      <li>일본 환급: 2026년 11월 1일 구매분부터 소비세 포함 가격으로 먼저 결제하고, 구매일부터 90일 안에 출국할 때 세관 확인을 받으면 소비세를 돌려받아요 (<a href="https://www.customs.go.jp/kaigairyoko/taxrefund/jpn.htm">일본 세관</a>, <a href="https://www.mlit.go.jp/kankocho/tax-free/page01_000001_00021.html">관광청</a>). 면세 대상은 세전 ¥5,000 이상이고 일반물품·소모품 구분은 없어졌어요 (<a href="https://www.gltjp.com/ja/article/item/21542/">제도 변경 정리</a>). 식품(주류 제외)은 소비세 8%예요. 환급 수수료는 매장마다 달라요. 예: 다카시마야는 소비세액의 23%를 떼요 (<a href="https://wellstsai.com/single-page-conclusion/japan-tax-refund-2026.html">매장별 정리</a>).</li>
+      <li>환율: 원/100엔 835.81원 (<a href="https://www.judal.co.kr/usMarket/10/fx?page=55&tab=quote">11/18 종가</a>), 원/달러 1,338원 가정 (<a href="https://www.koreancenter.or.kr/news/articleView.html?idxno=1440806">11/17 1,330원대 후반 보도</a>), 7월 899원대 (<a href="https://www.khan.co.kr/article/202607232044015/">경향신문</a>), 10월 840원대 (<a href="https://khan.co.kr/article/202610100600091">경향신문</a>). 세관은 통관 시점 과세환율로 계산하므로 면세 한도·세금은 오늘 환율로 본 예상치이고, 내 지갑 환율은 실제 부담액에만 써요. 인터넷이 되면 앱을 열 때 ECB 기준환율을 자동으로 받아요 (<a href="https://frankfurter.dev/v1/">Frankfurter, 키 없음, 하루 한 번 갱신</a>). 은행 매매기준율과 조금 다를 수 있고, 받지 못하면 마지막 저장값을 써요.</li>
+      <li>한국 세금: 1인 면세 $800, 면세점 구매 합산, 가족 합산 불가 (<a href="https://www.customs.go.kr/kcs/cm/cntnts/cntntsView.do?cntntsId=829&mi=2842">관세청</a>) · 간이세율 일반 물품 15%, 의류·섬유·신발 18% (<a href="https://www.law.go.kr/LSW/flDownload.do?flSeq=162071323">관세법 시행령 별표2, 개정 2023.2.28</a>) · 노트북·폰·태블릿·디지털카메라·게임기는 관세 0%라 부가세 10%만 계산하고 감면 대상에서 빼요 (<a href="https://glasswallet.com/blog/overseas-direct-purchase-customs-guide">품목별 관세율 정리</a>) · 자진신고 감면 30%, 최대 20만 원 (<a href="https://www.korea.kr/policy/civilView.do?newsId=148912566">정책브리핑</a>) · 미신고 가산세 40%, 2년 내 2회 이상 60% · 주류 2L·$400(병 수 제한 폐지), 향수 100ml 별도 (<a href="https://www.taxtimes.co.kr/mobile/article.html?no=268557">세정신문</a>). 고급 시계·가방(200만 원 초과)은 개별소비세가 붙는 별도 세율이라 여기서 계산하지 않아요. 규칙 확인일 2026-11-25.</li>
+      <li>판정: 차이가 1만 원 또는 국내 기준가의 3%보다 작으면 "가격 차이가 작아요"로 보여줘요. 이 기준은 임시값이라 사용자 테스트로 조정할 예정이에요. 모든 금액은 예상치이고 최종 세액은 <a href="https://www.customs.go.kr/kcs/ad/tax/BuyTaxCalculation.do?mi=2853">관세청 예상세액 조회</a>로 확인하세요.</li>
+    </ul>
+  </details>
+</div>
+<div class="minibar" id="minibar" role="status" aria-live="polite" hidden>
+  <div><div class="muted small" id="mb-label">내 면세 한도</div><b id="mb-used"></b></div>
+  <div class="gauge" id="mb-gauge-wrap" aria-hidden="true"><i class="g-shop" id="mb-gauge"></i></div>
+  <div><div class="muted small">국내가 대비</div><b id="mb-saved"></b></div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+"use strict";
+/* ================= 규칙 데이터 (근거·검증일과 함께 관리) ================= */
+const RULES_CHECKED = "2026-11-25";
+let USD = 1338;                          // 원/달러. 세관은 통관 시점 과세환율(관세청 고시)을 쓰므로 예상치. 여행 설정에서 고치거나 자동으로 받아요
+const LIM_USD = 800, DECL_RATE = 0.3, DECL_CAP = 200000, PENALTY = 0.4;
+const LIQ_ML = 2000, LIQ_USD = 400, PERF_ML = 100;
+const TF_MIN = 5000;                     // 일본 면세: 같은 사람·같은 매장·같은 날 세전 합계 ¥5,000 이상
+// "가격 차이가 작아요" 기준: 1만 원 또는 국내 기준가의 3% 중 큰 값. 임시 기준이라 사용자 테스트로 조정할 예정
+const EVEN_MIN = 10000, EVEN_PCT = 0.03;
+const JPY_BASE = {rate:835.81, asof:"11/18 종가"};
+const JPY_HISTORY = [["7/23",899.46],["10/9",840],["10/23",843.79],["11/2",851],["11/18",835.81]];
+const JUL_RATE = 899.46;
+
+// 한국 입국 세금 분류 (관세법 시행령 별표2 간이세율, 개정 2023.2.28). 쿠폰 분류와 따로 관리
+const TAX = {
+  gen:    {l:"일반 물품 · 간이세율 15%", rate:.15, red:true,  src:"관세법 시행령 별표2 제4호"},
+  wear:   {l:"의류·신발 · 간이세율 18%", rate:.18, red:true,  src:"관세법 시행령 별표2 제3호 나목"},
+  vat0:   {l:"관세 0% 물품 · 부가세 10%만", rate:.10, red:false, src:"관세율 무세 물품은 간이세율 대신 부가세만"},
+  liquor: {l:"주류 · 별도 한도", sep:"liquor"},
+  perfume:{l:"향수 · 별도 한도", sep:"perfume"}
+};
+// 상품 종류: 일본 소비세율(jct), 한국 세금 분류(tax), 빅카메라 쿠폰율(bic)
+const KINDS = {
+  pc:     {l:"노트북·폰·태블릿", tax:"vat0", jct:.10, bic:0},
+  apple:  {l:"애플 제품", tax:"vat0", jct:.10, bic:0, noCoupon:"애플 제품"},
+  camera: {l:"디지털카메라", tax:"vat0", jct:.10, bic:7},
+  watch:  {l:"시계", tax:"gen", jct:.10, bic:7},
+  av:     {l:"헤드폰·이어폰·가전", tax:"gen", jct:.10, bic:0},
+  game:   {l:"게임기", tax:"vat0", jct:.10, bic:0, noCoupon:"게임기 본체"},
+  beauty: {l:"화장품·뷰티", tax:"gen", jct:.10, bic:5},
+  med:    {l:"의약품·건강식품", tax:"gen", jct:.10, bic:5},
+  snack:  {l:"과자·식품 (소비세 8%)", tax:"gen", jct:.08, bic:5},
+  wear:   {l:"신발·의류", tax:"wear", jct:.10, bic:0},
+  bag:    {l:"가방·잡화", tax:"gen", jct:.10, bic:0},
+  liquor: {l:"주류", tax:"liquor", jct:.10, bic:3},
+  perfume:{l:"향수", tax:"perfume", jct:.10, bic:7},
+  etc:    {l:"기타", tax:"gen", jct:.10, bic:0}
+};
+// 매장: 쿠폰 규칙(ex = 같이 계산하는 세전 합계, unit = 1개 세전 가격), 면세 매장 여부 기본값, 환급 수수료(소비세액 대비 %) 기본값
+const STORES = {
+  bic:{l:"빅카메라",link:"https://livejapan.com/public/operation/coupon/biccamera/ko.html",taxfree:true,feePct:0,
+    rule(c,ex){ const k=KINDS[c]; if(k.noCoupon) return {p:0,why:`${k.noCoupon}은 쿠폰 제외예요.`};
+      if(ex<5000) return {p:0,why:"면세 후 ¥5,000 이상부터 쿠폰을 쓸 수 있어요."};
+      return k.bic?{p:k.bic,why:`이 종류는 쿠폰 ${k.bic}% 할인이에요.`}:{p:0,why:"이 종류는 공개된 쿠폰 할인율이 없어요. 계산대에서 확인하세요."}; }},
+  donki:{l:"돈키호테",link:"https://livejapan.com/public/operation/coupon/donki/ko.html",taxfree:true,feePct:0,
+    rule(c,ex,unit){ const k=KINDS[c]; if(k.noCoupon) return {p:0,why:`${k.noCoupon}은 쿠폰 제외예요.`};
+      if(c==="liquor") return {p:0,why:"주류는 돈키호테 쿠폰 제외예요."};
+      if(unit>=100000) return {p:0,why:"단품 ¥100,000 이상은 쿠폰 제외예요."};
+      if(ex>=30000) return {p:7,why:"한 번에 세전 ¥30,000 이상이라 7% 할인이에요."};
+      if(ex>=10000) return {p:5,why:"한 번에 세전 ¥10,000 이상이라 5% 할인이에요."};
+      return {p:0,why:"한 번에 세전 ¥10,000 이상 사면 쿠폰을 쓸 수 있어요."}; }},
+  dept:{l:"백화점·쇼핑몰",link:"",taxfree:true,feePct:23,rule:()=>({p:0,why:"백화점은 환급 때 수수료를 떼요. 예: 다카시마야는 소비세액의 23%. 매장 안내문의 비율로 바꿔 넣으세요."})},
+  other:{l:"기타 매장",link:"",taxfree:false,feePct:0,rule:()=>({p:0,why:"면세 매장인지, 쿠폰이 있는지 매장에서 확인하고 상세 조건에 넣어 주세요."})}
+};
+// 등록 상품: 가격의 성격·출처·확인 시점, 국내판과 다른 사양(spec)을 함께 기록
+const ITEMS = [
+  {id:"mba",short:"맥북 에어",name:"맥북 에어 13 (M5)",cat:"apple",yen:184800,kr:2190000,jpSrc:"애플 일본 공식가",krSrc:"애플 국내 출시가(보도)",checked:"2026.11",spec:"일본판은 일본어(JIS) 키보드일 수 있어요. 매장에서 US 배열 재고를 확인하세요."},
+  {id:"whxm6",short:"WH-1000XM6",name:"소니 WH-1000XM6",cat:"av",yen:59400,kr:619000,jpSrc:"소니스토어 공식가",krSrc:"국내 출시가(보도)",checked:"2026.11"},
+  {id:"wfxm6",short:"WF-1000XM6",name:"소니 WF-1000XM6",cat:"av",yen:44550,kr:499000,jpSrc:"소니 공식가(보도)",krSrc:"국내 출시가(보도)",checked:"2026.11"},
+  {id:"tt",short:"트립트랩",name:"스토케 트립트랩 체어",cat:"etc",yen:34980,kr:430000,jpSrc:"가격.com 최저가",krSrc:"국내 판매가(보도)",checked:"2026.11",note:"부피가 커서 위탁 수하물 규정을 확인하세요. 온라인 최저가라 매장 가격은 더 높을 수 있어요."},
+  {id:"onitsuka",short:"멕시코66",name:"오니츠카타이거 멕시코66",cat:"wear",yen:14300,kr:196000,jpSrc:"가격.com 최저가",krSrc:"가격 추적 사이트",checked:"2026.11",note:"사이즈·컬러별 가격이 달라요. 일본 매장 정가는 이보다 높을 수 있어요."},
+  {id:"iphone17",short:"아이폰 17",name:"아이폰 17 (256GB)",cat:"apple",yen:159800,kr:1287000,jpSrc:"애플 일본 공식가(인상 후)",krSrc:"애플 국내 출시가(보도)",checked:"2026.11",spec:"일본판은 카메라 셔터음을 끌 수 없어요."},
+  {id:"x100vi",short:"X100VI",name:"후지필름 X100VI",cat:"camera",yen:315700,kr:2399000,jpSrc:"일본 공식가(10월 인상 후, 보도)",krSrc:"국내 출시가(보도)",checked:"2026.11",note:"디지털카메라는 관세 0%라 한도를 넘으면 부가세 10%만 계산해요."},
+  {id:"switch2",short:"스위치2",name:"닌텐도 스위치2 (일본어 전용판)",cat:"game",yen:49980,kr:758000,jpSrc:"닌텐도 일본 공식가",krSrc:"국내 공식가(9/1 인상)",checked:"2026.11",spec:"일본어 전용판이라 한국어로 바꿀 수 없어요. 국내판과 같은 제품으로 보기 어려워요."},
+  {id:"kakubin",short:"가쿠빈",name:"산토리 가쿠빈 700ml",cat:"liquor",ml:700,yen:2101,kr:47500,jpSrc:"일본 권장가(보도)",krSrc:"국내 판매가",checked:"2026.11",note:"술은 $800과 별도 한도(2L·$400)예요. 700ml는 3병(2.1L)부터 한도를 넘어요. 혼자 사면 세전 ¥5,000이 안 돼 환급도 안 돼요."}
+];
+// 상품 매칭: exact가 정확히 같을 때만 가격을 씀. broad는 "혹시 이 상품?" 안내에만 쓰고 가격은 넣지 않음
+const MATCH = [
+  {id:"mba",exact:["맥북 에어 13 (M5)","맥북 에어 13 M5","macbook air 13 m5"],broad:["맥북","macbook"]},
+  {id:"whxm6",exact:["소니 WH-1000XM6","WH-1000XM6"],broad:["소니 헤드폰","1000xm"]},
+  {id:"wfxm6",exact:["소니 WF-1000XM6","WF-1000XM6"],broad:["소니 이어폰","1000xm"]},
+  {id:"tt",exact:["스토케 트립트랩 체어","트립트랩 체어","tripp trapp"],broad:["스토케","stokke","트립트랩"]},
+  {id:"onitsuka",exact:["오니츠카타이거 멕시코66","멕시코66","mexico 66"],broad:["오니츠카","onitsuka"]},
+  {id:"iphone17",exact:["아이폰 17 (256GB)","아이폰 17 256GB","iphone 17 256gb"],broad:["아이폰","iphone"]},
+  {id:"x100vi",exact:["후지필름 X100VI","X100VI"],broad:["후지필름","fujifilm","x100"]},
+  {id:"switch2",exact:["닌텐도 스위치2 (일본어 전용판)","스위치2 일본어 전용판"],broad:["스위치","switch"]},
+  {id:"kakubin",exact:["산토리 가쿠빈 700ml","가쿠빈 700ml"],broad:["가쿠빈","산토리","suntory"]}
+];
+const norm = s => String(s).toLowerCase().replace(/[\s\-_()·.,/]/g, "");
+
+/* ================= 상태와 저장 ================= */
+const STORE_KEY = "ft-v5";
+const params = new URLSearchParams(location.search);
+const DEMO = params.has("demo");
+const TODAY = DEMO ? new Date("2026-11-25T00:00:00") : new Date();
+let uidSeq = 0;
+const uid = () => (globalThis.crypto && crypto.randomUUID) ? crypto.randomUUID() : `u${Date.now().toString(36)}${(uidSeq++).toString(36)}${Math.random().toString(36).slice(2,8)}`;
+// 처음엔 리스트가 비어 있어요. 예시는 "예시로 채워 보기"를 눌렀을 때만 들어가요
+const fresh = () => ({themeV:6,nights:3,usd:1338,usdEdited:false,theme:"modern",fx:null,city:"오사카",date:"2026-12-18",people:1,jpy:Math.round(JPY_BASE.rate),jpyEdited:false,declare:true,tab:"during",
+  lines:[],custom:{},dfs:[0,0,0,0,0,0],wallet:{yen:0,krw:0},useWallet:false,alert:{on:false,target:840},exchange:100000,person:1});
+
+function num(v,fb){ const n = parseFloat(v); return Number.isFinite(n) ? n : fb; }
+function int(v,fb){ return Math.round(num(v,fb)); }
+function clamp(v,lo,hi){ return Math.min(hi, Math.max(lo, v)); }
+function itemById(id, custom){ return ITEMS.find(i=>i.id===id) || (custom||S.custom)[id]; }
+
+function load(){
+  const base = fresh();
+  try{
+    const v5 = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+    if (v5) return sanitize({...base, ...v5, themeV:v5.themeV, wallet:{...base.wallet, ...(v5.wallet||{})}, alert:{...base.alert, ...(v5.alert||{})}});
+    const v3 = JSON.parse(localStorage.getItem("ft-v3") || "null");   // 이전 버전 데이터 옮기기
+    if (v3){
+      const custom = {}; (v3.custom||[]).forEach(c => { if (c && c.id){ const {qty,id,...rest} = c; custom[id] = {...rest, custom:true}; } });
+      const lines = (v3.cart||[]).map(([id,p]) => ({uid:uid(), itemId:id, person:p, qty:Math.max(1,(v3.custom||[]).find(c=>c.id===id)?.qty||1), buy:"jp"}));
+      return sanitize({...base, lines, custom, dfs:v3.dfs||base.dfs, tab:v3.tab||base.tab, wallet:v3.wallet||base.wallet, useWallet:!!v3.useWallet, people:Math.max(1,...lines.map(l=>l.person||1))});
+    }
+  }catch(e){}
+  return base;
+}
+function sanitize(s){
+  s.people = clamp(int(s.people,1),1,6);
+  s.jpy = clamp(num(s.jpy,836),700,1000); s.jpyEdited = !!s.jpyEdited;
+  s.dfs = Array.from({length:6},(_,k)=>clamp(num((s.dfs||[])[k],0),0,10000));
+  s.custom = s.custom && typeof s.custom==="object" ? s.custom : {};
+  for (const [k,c] of Object.entries(s.custom)){
+    if (!c || typeof c!=="object"){ delete s.custom[k]; continue; }
+    c.custom = true; c.name = String(c.name||"직접 입력 상품").slice(0,60);
+    if (!KINDS[c.cat]) c.cat = "etc"; if (!STORES[c.store]) c.store = "other";
+    c.yen = clamp(num(c.yen,0),0,1e7); c.kr = clamp(num(c.kr,0),0,1e8); c.coupon = clamp(num(c.coupon,0),0,30); c.ml = clamp(num(c.ml,0),0,5000);
+    c.taxfree = c.taxfree === undefined ? STORES[c.store].taxfree : !!c.taxfree; c.feePct = clamp(num(c.feePct, STORES[c.store].feePct),0,50);
+    delete c.fee; delete c.us;
+  }
+  s.lines = (Array.isArray(s.lines)?s.lines:[]).filter(l => l && itemById(l.itemId, s.custom))
+    .map(l => ({uid:l.uid||uid(), itemId:l.itemId, person:clamp(int(l.person,1),1,s.people), qty:clamp(int(l.qty,1),1,99), buy:l.buy==="kr"?"kr":"jp"}));
+  s.wallet = {yen:clamp(num(s.wallet.yen,0),0,1e8), krw:clamp(num(s.wallet.krw,0),0,1e10)};
+  s.exchange = clamp(num(s.exchange,100000),0,1e7);
+  s.alert = {on:!!s.alert.on, target:clamp(int(s.alert.target,840),500,1500)};
+  s.person = clamp(int(s.person,1),1,s.people);
+  s.nights = clamp(int(s.nights,3),1,30);
+  s.usd = clamp(num(s.usd,1338),1000,2000); s.usdEdited = !!s.usdEdited;
+  // v6에서 기본 디자인이 바뀌어서, 예전에 저장된 테마는 한 번 기본(모던)으로 되돌려요. 이후 고른 테마는 그대로 기억해요
+  if (s.themeV !== 6){ s.theme = "modern"; s.themeV = 6; }
+  s.theme = s.theme === "retro" ? "retro" : "modern";
+  s.fx = s.fx && num(s.fx.rate,0) > 500 && num(s.fx.rate,0) < 1500 && num(s.fx.usd,0) > 800 ? {rate:+s.fx.rate, usd:+s.fx.usd, date:String(s.fx.date||"").slice(0,10), fetchedAt:num(s.fx.fetchedAt,0)} : null;
+  s.declare = s.declare !== false; s.useWallet = !!s.useWallet;
+  if (!["before","during","after"].includes(s.tab)) s.tab = "during";
+  return s;
+}
+if (params.has("reset")) { try{ localStorage.removeItem(STORE_KEY); localStorage.removeItem("ft-v3"); }catch(e){} }
+const S = load();
+USD = S.usd;
+if (["retro","modern"].includes(params.get("theme"))) S.theme = params.get("theme");
+document.documentElement.dataset.theme = S.theme;
+// 기준 환율: 자동으로 받은 ECB 기준환율이 있으면 그것, 없으면 데모 기본값
+const fxBase = () => S.fx ? {rate:+S.fx.rate.toFixed(2), asof:`${S.fx.date} ECB 기준환율`, live:true} : JPY_BASE;
+// 저장: 여행 설정·인원·환율·사람별 배정·수량·구매처·면세점 구매·지갑·신고 여부까지 전부
+function save(){
+  const used = new Set(S.lines.map(l=>l.itemId));
+  for (const k of Object.keys(S.custom)) if (!used.has(k)) delete S.custom[k];
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(S)); }catch(e){}
+}
+
+/* ================= 작은 도우미 ================= */
+const $ = id => document.getElementById(id);
+const readNum = (id,lo,hi,fb) => clamp(num($(id).value, fb), lo, hi);
+function fixField(id,lo,hi,fb,isInt){ const el=$(id); let v=readNum(id,lo,hi,fb); if(isInt) v=Math.round(v); if(el.value!==String(v)) el.value=v; return v; }
+const fmt = n => Math.round(n).toLocaleString("ko-KR");
+const won = n => fmt(n) + "원";
+const man = n => { const v=Math.abs(n)/10000; return (v>=10?v.toFixed(0):v.toFixed(1)).replace(/\.0$/,"") + "만 원"; };
+const gap = n => Math.abs(n) < 10000 ? won(Math.abs(n)) : man(n);
+const usd = n => "$" + Math.round(n).toLocaleString("en-US");
+const personLabel = p => p===1 ? "1번 · 나" : `${p}번 동행`;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const kindOf = i => KINDS[i.cat] || KINDS.etc;
+const taxOf = i => TAX[kindOf(i).tax];
+
+/* ================= 금액 계산 =================
+   한 물건에 금액이 셋: 매장에서 먼저 내는 돈(소비세 포함) → 출국 때 돌려받는 돈 → 실제 부담.
+   환급은 면세 매장에서, 같은 사람·같은 매장 세전 합계가 ¥5,000 이상일 때만. 참고 상품은 그 줄만으로 판단. */
+const paidYen = i => i.yen * (1 - (i.coupon||0)/100);
+const exOf = i => paidYen(i) / (1 + kindOf(i).jct);
+const taxfreeOf = i => i.custom ? !!i.taxfree : true;
+const feeOf = i => i.custom ? (i.feePct||0)/100 : 0;
+const walletRate = () => S.wallet.yen>0 && S.wallet.krw>0 ? S.wallet.krw / S.wallet.yen * 100 : 0;
+const walletOn = () => S.useWallet && walletRate() > 0;
+
+// entries: [{l, it, q, person, cand}] → 줄별 금액. 세관 과세가격은 공식 환율 r, 실제 부담은 지갑 엔화를 담은 순서대로 먼저 쓰고 나머지는 r
+function evalEntries(entries, r, noWallet){
+  const sums = {};
+  entries.forEach(x => { x.key = x.it.custom ? `${x.person}|${x.it.store}` : `${x.person}|ref|${x.l ? x.l.uid : "cand"}`;
+    x.ex = exOf(x.it)*x.q; if (taxfreeOf(x.it)) sums[x.key] = (sums[x.key]||0) + x.ex; });
+  let left = (!noWallet && walletOn()) ? S.wallet.yen : 0; const wr = walletRate();
+  const rows = entries.map(x => {
+    const elig = taxfreeOf(x.it) && (sums[x.key]||0) >= TF_MIN;
+    const paid = paidYen(x.it)*x.q, refund = elig ? (paid - x.ex)*(1 - feeOf(x.it)) : 0, net = paid - refund;
+    const cover = Math.min(left, paid), f = paid ? cover/paid : 0; left -= cover;
+    const eff = f*wr + (1-f)*r;
+    return {...x, elig, groupEx:sums[x.key]||0, paid, refund, net, f, eff, cover,
+      paidKRW: paid*eff/100, refundKRW: refund*eff/100, cost: net*eff/100,
+      customs: (elig ? x.ex : paid)*r/100, kr:(x.it.kr||0)*x.q};
+  });
+  rows.walletLeft = left;
+  return rows;
+}
+const cartEntries = () => S.lines.filter(l=>l.buy!=="kr").map(l => ({l, it:itemById(l.itemId), q:l.qty, person:l.person})).filter(x=>x.it);
+function evalLines(r, noWallet){ const rows = evalEntries(cartEntries(), r, noWallet); return {rows, walletLeft:rows.walletLeft}; }
+const partOf = row => { const t = taxOf(row.it); return {k:row.customs, rate:t.rate||0, red:!!t.red, sep:t.sep||"", ml:(row.it.ml||0)*row.q}; };
+
+// 1인 세금: $800 공제를 세율 높은 것부터 빼고 남은 금액에 세율. 감면은 간이세율 세액의 30%(최대 20만 원)
+function personTax(parts, declare, dfsUSD){
+  const g = parts.filter(p=>!p.sep).map(p=>({k:p.k, rate:p.rate, red:p.red}));
+  if (dfsUSD>0) g.push({k:dfsUSD*USD, rate:TAX.gen.rate, red:true});   // 면세점 구매분은 일반 물품으로 가정
+  const sumK = g.reduce((a,p)=>a+p.k,0), limK = LIM_USD*USD;
+  let left = limK, full = 0, red = 0;
+  [...g].sort((a,b)=>b.rate-a.rate).forEach(p => { const d=Math.min(left,p.k); left-=d; const t=(p.k-d)*p.rate; full+=t; if(p.red) red+=t; });
+  const cut = declare ? Math.min(red*DECL_RATE, DECL_CAP) : 0;
+  return {usd:sumK/USD, over:Math.max(0,sumK-limK)/USD, full, cut, tax:full-cut};
+}
+// 주류·향수 별도 한도. 넘으면 주세 등 여기서 계산하지 못한 세금이 생김
+function sepCheck(parts){
+  const lq = parts.filter(p=>p.sep==="liquor"), pf = parts.filter(p=>p.sep==="perfume");
+  const lml = lq.reduce((a,p)=>a+p.ml,0), lusd = lq.reduce((a,p)=>a+p.k,0)/USD, pml = pf.reduce((a,p)=>a+p.ml,0);
+  const okL = lml<=LIQ_ML && lusd<=LIQ_USD, okP = pml<=PERF_ML, msgs = [];
+  if (lq.length) msgs.push(okL ? `주류 ${lml.toLocaleString()}ml · ${usd(lusd)} → 별도 한도(2L·$400) 안이라 세금 0원`
+                              : `주류 ${lml.toLocaleString()}ml · ${usd(lusd)} → 별도 한도(2L·$400) 초과. 신고 대상이고 주세·교육세는 여기서 계산하지 못해요`);
+  if (pf.length) msgs.push(okP ? `향수 ${pml}ml → 별도 한도(100ml) 안이라 세금 0원` : `향수 ${pml}ml → 별도 한도(100ml) 초과. 신고 대상이고 세금은 여기서 계산하지 못해요`);
+  return {ok:okL&&okP, msgs};
+}
+function personSummary(p, r, declare, ev){
+  const mine = ev.rows.filter(x=>x.person===p), parts = mine.map(partOf), dfs = S.dfs[p-1]||0;
+  const t = personTax(parts, declare, dfs), base = personTax([], declare, dfs), sep = sepCheck(parts);
+  const sum = k => mine.reduce((a,x)=>a+x[k],0);
+  const krOnly = S.lines.filter(l=>l.person===p && l.buy==="kr").map(l=>({l, it:itemById(l.itemId)})).filter(x=>x.it);
+  return {p, mine, parts, t, extra:t.tax-base.tax, sep, unknown:!sep.ok, paid:sum("paidKRW"), refund:sum("refundKRW"), cost:sum("cost"), kr:sum("kr"),
+    save: sum("kr") - sum("cost") - (t.tax-base.tax), krOnly, krOnlySum: krOnly.reduce((a,x)=>a+x.it.kr*x.l.qty,0),
+    shopUSD: parts.filter(x=>!x.sep).reduce((a,x)=>a+x.k,0)/USD, need: t.over>0 || !sep.ok};
+}
+// 후보 물건의 "더하면 얼마나 달라지나"(한계 비용). p=0이면 리스트와 무관하게 혼자 샀을 때
+function evalCandidate(c, p, r, declare, opt){
+  const noWallet = !!(opt && opt.noWallet), q = c.qty||1;
+  const base = p ? cartEntries() : [];
+  const before = evalEntries(base.map(x=>({...x})), r, noWallet);
+  const after = evalEntries([...base.map(x=>({...x})), {l:null, it:c, q, person:p||0, cand:true}], r, noWallet);
+  const cand = after[after.length-1];
+  const mineB = before.filter(x=>x.person===p), mineA = after.filter(x=>x.person===(p||0));
+  const dfs = p ? S.dfs[p-1]||0 : 0;
+  const tB = personTax(mineB.map(partOf), declare, dfs), tA = personTax(mineA.map(partOf), declare, dfs);
+  const sepA = sepCheck(mineA.map(partOf)), sepB = sepCheck(mineB.map(partOf));
+  const others = mineA.filter(x=>!x.cand).reduce((a,x)=>a+x.cost,0) - mineB.reduce((a,x)=>a+x.cost,0);
+  const isSep = !!taxOf(c).sep, add = isSep ? 0 : tA.tax - tB.tax, kr = (c.kr||0)*q;
+  return {cand, pay:cand.cost, others, add, kr, save: kr - cand.cost - others - add, tA, tB, sepAfter:sepA,
+          sepOver: isSep && !sepA.ok, walletLeft: after.walletLeft + cand.cover};
+}
+// 손익분기 환율: 판정과 똑같은 함수로 오늘 환율만 바꿔 가며 찾음 (지갑 엔화로 낸 부분은 이미 정해진 환율 그대로)
+function breakEven(saveAt){
+  const lo = 300, hi = 3000;
+  if (saveAt(lo) <= 0) return {never:true};
+  if (saveAt(hi) > 0) return {always:true};
+  let a = lo, b = hi;
+  for (let k=0; k<40; k++){ const m=(a+b)/2; if (saveAt(m) > 0) a=m; else b=m; }
+  return {r:Math.round((a+b)/2)};
+}
+const evenBand = kr => Math.max(EVEN_MIN, kr*EVEN_PCT);
+// 판정 4단계: 일본 유리 / 차이 작음 / 국내 유리 / 조건 확인 필요
+function verdictOf(save, kr, unknown){
+  if (!kr) return {cls:"is-check", text:"조건 확인이 필요해요", why:"한국 판매가를 넣어야 비교할 수 있어요."};
+  if (unknown) return {cls:"is-check", text:"조건 확인이 필요해요", why:"별도 한도를 넘어 여기서 계산하지 못한 세금이 있어요."};
+  if (Math.abs(save) < evenBand(kr)) return {cls:"is-even", text:"가격 차이가 작아요", why:`차이 ${won(Math.abs(save))} · 가격이 조금만 바뀌어도 뒤집힐 수 있어요.`};
+  return save > 0 ? {cls:"is-good", text:"일본 구매가 유리해요", why:`국내 기준가보다 ${gap(save)} 적게 들어요.`}
+                  : {cls:"is-bad", text:"국내 구매가 유리해요", why:`일본에서 사면 ${gap(save)} 더 들어요.`};
+}
+// 내 리스트 안에서 일본·한국 나눠 사기: 한 사람의 물건마다 어디서 살지 모든 경우를 비교 (추천 상품을 새로 더하지 않음)
+function optimizeSplit(p, r, declare){
+  const all = S.lines.filter(l=>l.person===p), mine = all.slice(0,12), orig = mine.map(l=>l.buy);
+  let best = {v:0, mask:0}; const n = mine.length;
+  for (let m=0; m<(1<<n); m++){
+    mine.forEach((l,k)=>l.buy = (m>>k&1) ? "jp" : "kr");
+    const s = personSummary(p, r, declare, evalLines(r));
+    if (s.unknown) continue;
+    if (s.save > best.v + 1) best = {v:s.save, mask:m};
+  }
+  mine.forEach((l,k)=>l.buy = (best.mask>>k&1) ? "jp" : "kr");
+  return {v:best.v, jp:mine.filter(l=>l.buy==="jp").length, kr:mine.filter(l=>l.buy==="kr").length, changed:mine.some((l,k)=>l.buy!==orig[k]), skipped:all.length-mine.length};
+}
+</script>
+<script>
+"use strict";
+/* ================= 화면 갱신 =================
+   입력칸이 있는 영역(장바구니)은 구조가 바뀔 때만 새로 만들고, 평소엔 숫자·클래스만 바꿔요.
+   그래서 면세점 금액을 입력하는 도중에도 포커스와 커서가 그대로 있어요. */
+let fxStatus = "idle", couponTouched = false, krTouched = false, yenTouched = false, feeTouched = false, matchId = null, toastTimer = 0, structKey = "", pathsKey = "";
+const setText = (id,t) => { const el=$(id); if (el.textContent !== t) el.textContent = t; };
+const setHTML = (id,h) => { const el=$(id); if (el.innerHTML !== h) el.innerHTML = h; };
+const curPerson = () => clamp(S.person, 1, S.people);
+function toast(msg){ const t=$("toast"); t.textContent = msg; t.classList.add("is-on"); clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.classList.remove("is-on"), 2800); }
+function pulse(){ const m=$("minibar"); m.classList.remove("is-pulse"); void m.offsetWidth; m.classList.add("is-pulse"); }
+const naverURL = q => "https://search.shopping.naver.com/search/all?query=" + encodeURIComponent(q);
+const signed = n => (n>=0 ? "+" : "−") + gap(n);
+
+function renderTrip(){
+  const d = new Date(S.date + "T00:00:00");
+  const dt = isNaN(d) ? "출발일 미정" : `${d.getMonth()+1}월 ${d.getDate()}일 출발 ${S.nights}박`;
+  setText("trip-sum", `${S.city} · ${dt} · ${S.people}명 · 100엔 ${Math.round(S.jpy)}원`);
+  const fb = fxBase();
+  setText("jpy-val", S.jpyEdited ? `${Math.round(S.jpy)}원 · 직접 조정 (기준 ${fb.rate}원, ${fb.asof})` : `${Math.round(S.jpy)}원 · ${fb.asof}`);
+  setText("usd-val", S.usdEdited ? `${S.usd}원 · 직접 입력` : (S.fx ? `${S.usd}원 · ${S.fx.date} ECB 기준` : `${S.usd}원 · 데모 기본값`));
+  setText("fx-status", {live:"✓ 오늘 받은 ECB 기준환율을 쓰고 있어요.", cached:`인터넷 연결이 안 돼서 마지막에 받은 환율(${S.fx ? S.fx.date : ""})로 계산해요.`,
+    fail:"자동 환율을 받지 못해 저장된 값으로 계산해요. 공유 미리보기 화면에선 외부 연결이 막혀 있을 수 있어요.", offline:"오프라인이에요. 저장된 환율로 계산해요.", idle:"", loading:"환율을 받는 중…"}[fxStatus] || "");
+  document.querySelectorAll(".city-name").forEach(e => { if (e.textContent !== S.city) e.textContent = S.city; });
+}
+
+function drawSpark(){
+  const W=520, H=140, pl=40, pr=26, pt=18, pb=26;
+  const pts = [...JPY_HISTORY.map(([l,v])=>({l,v})), {l:"지금",v:S.jpy,now:true}];
+  const vs = pts.map(p=>p.v), lo = Math.min(...vs)-12, hi = Math.max(...vs)+12;
+  const x = k => pl + k*(W-pl-pr)/(pts.length-1), y = v => pt + (hi-v)*(H-pt-pb)/(hi-lo);
+  let d = `M${x(0)},${y(pts[0].v)}`;
+  for (let k=1; k<pts.length; k++){ const x0=x(k-1), y0=y(pts[k-1].v), x1=x(k), y1=y(pts[k].v), cx=(x0+x1)/2; d += ` C${cx},${y0} ${cx},${y1} ${x1},${y1}`; }
+  const area = `${d} L${x(pts.length-1)},${H-pb} L${x(0)},${H-pb} Z`;
+  setHTML("spark",
+    `<defs><linearGradient id="sp-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1E6FE8" stop-opacity=".25"/><stop offset="1" stop-color="#1E6FE8" stop-opacity="0"/></linearGradient></defs>` +
+    `<text x="0" y="${y(hi-12)+4}">${Math.round(hi-12)}</text><text x="0" y="${y(lo+12)+4}">${Math.round(lo+12)}</text>` +
+    `<path class="sp-area" d="${area}"/><path class="sp-line" d="${d}"/>` +
+    pts.map((p,k)=>`<circle class="${p.now?"sp-now":"sp-dot"}" cx="${x(k)}" cy="${y(p.v)}" r="${p.now?5.5:4}"/><text class="${p.now?"sp-now-label":""}" x="${x(k)}" y="${H-6}" text-anchor="middle">${p.l}</text>`).join(""));
+}
+
+function renderBefore(){
+  const r = S.jpy, chg = r - JUL_RATE;
+  setText("fx-big", `${Math.round(r)}원`);
+  const fb = fxBase();
+  setText("fx-src", (S.jpyEdited ? `직접 조정한 값이에요. 기준 환율은 ${fb.asof} ${fb.rate}원이에요.` : `${fb.asof} ${fb.rate}원${fb.live ? " (은행 매매기준율과 조금 다를 수 있어요)" : " · 데모 기본값"}.`)
+    + " 마지막 값을 기기에 저장해서 인터넷이 안 되는 매장에서도 계산돼요.");
+  const chip = $("fx-chg"); chip.textContent = `7월보다 ${Math.abs(chg).toFixed(0)}원 ${chg<0?"싸요":"비싸요"}`; chip.className = "chip " + (chg<0 ? "chip-good" : "chip-bad");
+  const d = new Date(S.date + "T00:00:00"), t0 = new Date(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate());
+  let dd = "";
+  if (!isNaN(d)){
+    const n = Math.round((d - t0) / 86400000);
+    dd = n>0 ? `출발까지 D-${n}. 엔화는 한 번에 바꾸기보다 출발 전까지 나눠 바꾸면 환율 위험이 줄어요.`
+       : n===0 ? "오늘 출발이에요! 지갑 환율을 넣어 두면 매장 계산이 더 정확해져요."
+       : "출발일이 지났어요. 귀국 전 탭에서 세관 신고를 정리해 보세요.";
+  }
+  setText("dday", dd);
+  const y = S.exchange, now = y*r/100, jul = y*JUL_RATE/100;
+  setText("ex-now", won(now));
+  setText("ex-jul", won(jul));
+  const tgt = S.alert.target, btn = $("alert-btn");
+  btn.textContent = S.alert.on ? `알림 끄기 (100엔 ${tgt}원 이하)` : `100엔 ${tgt}원 이하가 되면 알림 받기`;
+  btn.classList.toggle("btn-dark", S.alert.on);
+  let am = `7월보다 ${won(Math.abs(jul-now))} ${jul>now?"덜 들어요":"더 들어요"}. ` + (r <= tgt ? `지금 ${Math.round(r)}원으로 목표(${tgt}원) 이하예요. 환전하기 좋은 때예요.` : `목표까지 ${Math.round(r-tgt)}원 남았어요.`);
+  if (S.alert.on) am += " 알림이 켜져 있어요. 데모라 실제 알림은 가지 않아요.";
+  setText("alert-msg", am);
+  const wr = walletRate();
+  setText("w-rate", wr ? `100엔 ${wr.toFixed(1)}원 · 오늘보다 ${Math.abs(wr-r).toFixed(1)}원 ${wr<r?"싸게":"비싸게"} 바꿨어요` : "환전 기록을 넣으면 계산돼요");
+  renderPrep();
+  drawSpark();
+}
+// 여행 준비: 여행지·날짜·인원을 채운 실제 검색 링크
+const CITY_EN = {"오사카":"Osaka","도쿄":"Tokyo","후쿠오카":"Fukuoka","삿포로":"Sapporo"};
+function tripDates(){
+  const d = new Date(S.date + "T00:00:00"); if (isNaN(d)) return null;
+  const e = new Date(d); e.setDate(e.getDate() + S.nights);
+  const iso = x => `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`;
+  return {in:iso(d), out:iso(e), label:`${d.getMonth()+1}/${d.getDate()} ~ ${e.getMonth()+1}/${e.getDate()}`};
+}
+function renderPrep(){
+  const t = tripDates(), en = CITY_EN[S.city] || S.city;
+  setText("prep-sum", t ? `${S.city} · ${t.label} (${S.nights}박) · ${S.people}명 기준으로 연결해요.` : "여행 설정에서 출발일을 넣으면 날짜가 채워진 검색으로 연결돼요.");
+  setText("prep-trip", t ? `${S.city} · ${t.label} · ${S.people}명 · 방 1개` : `${S.city} · 날짜 미정`);
+  const hotel = new URL("https://www.booking.com/searchresults.ko.html");
+  hotel.searchParams.set("ss", en); hotel.searchParams.set("group_adults", S.people); hotel.searchParams.set("no_rooms", 1); hotel.searchParams.set("group_children", 0);
+  if (t){ hotel.searchParams.set("checkin", t.in); hotel.searchParams.set("checkout", t.out); }
+  $("prep-hotel").href = hotel.href;
+  const q = t ? `Flights to ${en} from Seoul on ${t.in} through ${t.out} for ${S.people} adults` : `Flights to ${en} from Seoul`;
+  $("prep-flight").href = "https://www.google.com/travel/flights?hl=ko&q=" + encodeURIComponent(q);
+  setText("prep-esim", `${S.nights + 1}일 쓸 데이터면 돼요. 여행 기간보다 하루 넉넉한 상품을 고르세요.`);
+  const wr = walletRate(), y = S.exchange;
+  setText("prep-fx", wr ? `환전 기록: 100엔 ${wr.toFixed(1)}원. 지금 바꾸면 ¥${fmt(y)}에 ${won(y*S.jpy/100)}이에요.` : `트래블카드로 ¥${fmt(y)}를 지금 바꾸면 약 ${won(y*S.jpy/100)}이에요. 바꾼 뒤엔 위의 "내 지갑 환율"에 기록해 두세요.`);
+}
+
+/* ---------- 매장 계산기 ---------- */
+// 정확한 모델명일 때만 등록 가격을 씀. "맥북 프로"처럼 비슷하기만 하면 안내만 하고 가격은 넣지 않음
+function matchName(q){
+  const n = norm(q); if (!n) return {item:null, near:null};
+  const m = MATCH.find(x => x.exact.some(e => norm(e)===n) || norm(ITEMS.find(i=>i.id===x.id).name)===n);
+  if (m) return {item:ITEMS.find(i=>i.id===m.id), near:null};
+  const b = MATCH.find(x => x.broad.some(k => n.includes(norm(k))));
+  return {item:null, near: b ? ITEMS.find(i=>i.id===b.id) : null};
+}
+function readCalc(){
+  const cat = $("c-cat").value;
+  return { name: ($("c-name").value.trim() || "이름 없는 상품").slice(0,60), store: $("c-store").value, cat,
+    yen: readNum("c-yen",0,1e7,0), kr: $("c-kr").value==="" ? 0 : readNum("c-kr",0,1e8,0), qty: Math.round(readNum("c-qty",1,99,1)),
+    ml: TAX[KINDS[cat].tax].sep ? readNum("c-ml",0,5000,0) : 0, coupon: readNum("c-coupon",0,30,0),
+    taxfree: $("c-taxfree").checked, feePct: readNum("c-feepct",0,50,0), person: curPerson(), custom: true };
+}
+// 같은 사람·같은 매장에서 담은 직접 입력 상품과 한 번에 계산하면 쿠폰 단계가 올라가는지
+function couponInfo(c){
+  const st = STORES[c.store], unit = c.yen/(1+KINDS[c.cat].jct), alone = unit*c.qty;
+  const same = S.lines.filter(l=>l.person===c.person && l.buy!=="kr").map(l=>({l, it:itemById(l.itemId)}))
+    .filter(x => x.it && x.it.custom && x.it.store===c.store && st.rule(x.it.cat, 1e9, x.it.yen/(1+kindOf(x.it).jct)).p > 0);
+  const sameEx = same.reduce((a,x)=>a + x.it.yen/(1+kindOf(x.it).jct)*x.l.qty, 0), total = alone + sameEx;
+  return {st, ra: st.rule(c.cat, alone, unit), rc: st.rule(c.cat, total, unit), same, sameEx, total, eligible: st.rule(c.cat, 1e9, unit).p > 0};
+}
+function comboHTML(c, ci){
+  const st = ci.st;
+  if (ci.sameEx > 0 && ci.rc.p > ci.ra.p && ci.rc.p > c.coupon)
+    return `같은 ${st.l}에서 담은 물건 ¥${fmt(ci.sameEx)}(세전)과 한 번에 계산하면 합계 ¥${fmt(ci.total)}이라 <b>${ci.rc.p}% 쿠폰</b> 조건을 채워요. 택스프리는 여권별이라 같은 사람 물건끼리만 합쳤어요.
+      <br><button class="btn btn-sm" type="button" data-act="combo" data-p="${ci.rc.p}">같이 계산해서 ${ci.rc.p}% 적용</button>`;
+  if (!ci.eligible || c.yen<=0) return "";
+  if (c.store==="donki" && ci.total < 30000){
+    const need = (ci.total<10000 ? 10000 : 30000) - ci.total, p = ci.total<10000 ? 5 : 7;
+    return `세전 ¥${fmt(need)}어치를 더 같이 계산하면 ${p}% 쿠폰 조건이 돼요. 원래 살 물건이 있을 때만 의미 있어요.`;
+  }
+  if (c.store==="bic" && ci.total < 5000) return `면세 후 ¥${fmt(5000-ci.total)}어치를 더 사면 쿠폰을 쓸 수 있어요.`;
+  return "";
+}
+function renderCalc(){
+  const c = readCalc(), r = S.jpy, ci = couponInfo(c), k = KINDS[c.cat], tx = TAX[k.tax];
+  $("c-ml-wrap").hidden = !tx.sep;
+  $("c-person-wrap").hidden = S.people < 2;
+  if (!couponTouched && $("c-coupon").value !== String(ci.ra.p)){ $("c-coupon").value = ci.ra.p; c.coupon = ci.ra.p; }
+  let rule = `${ci.st.l}: ${ci.ra.why}`;
+  if (couponTouched && c.coupon !== ci.ra.p) rule += ` 지금은 직접 넣은 ${c.coupon}%로 계산해요.`;
+  setText("c-rule", rule);
+  setText("c-taxclass", `한국 세금 분류: ${tx.l}${tx.src ? ` (${tx.src})` : ""} · 일본 소비세 ${Math.round(k.jct*100)}%`);
+  const combo = comboHTML(c, ci), cb = $("c-combo"); cb.hidden = !combo; setHTML("c-combo", combo);
+  setText("c-more-sum", `${ci.st.l} · ${k.l} · ${c.qty}개 · 쿠폰 ${c.coupon}%${c.taxfree ? "" : " · 면세 매장 아님"}${S.people>1 ? ` · ${personLabel(c.person)}` : ""}`);
+
+  const e = evalCandidate(c, c.person, r, S.declare);
+  const v = c.yen<=0 ? {cls:"is-check", text:"가격표를 넣어 주세요", why:"눈앞의 가격표(소비세 포함)를 그대로 넣으면 돼요."} : verdictOf(e.save, e.kr, e.sepOver);
+  const who = S.people>1 ? personLabel(c.person) : "내";
+  let tax;
+  if (tx.sep) tax = e.sepAfter.msgs.join(" · ");
+  else if (e.add > 0) tax = `이걸 담으면 ${who} 한도를 ${usd(e.tA.over)} 넘어서 입국 세금 <b>${won(e.add)}</b>이 늘어요 (${S.declare?"자진신고 감면 반영":"신고 안 함 기준"})`;
+  else tax = `입국 세금 0원 · ${who} 한도 ${usd(e.tA.usd)} / $800`;
+  const wr = walletRate(), cd = e.cand;
+  const wl = walletOn() && cd.cover>0 ? `<br>지갑 엔화 ¥${fmt(cd.cover)}는 ${wr.toFixed(1)}원${cd.cover < cd.paid ? `, 나머지 ¥${fmt(cd.paid-cd.cover)}는 카드 결제로 보고 오늘 환율` : ""}로 계산했어요.` : "";
+  const oth = Math.abs(e.others) >= 1 ? `<br>같이 사면 같은 매장 물건도 환급 조건(세전 ¥5,000)을 채워 ${won(-e.others)} 더 돌려받아요.` : "";
+  const it = matchId ? ITEMS.find(i=>i.id===matchId) : null;
+  const spec = it && it.spec ? `<div class="spec">⚠ 사양 차이 있음 · ${esc(it.spec)}</div>` : "";
+  const box = $("c-verdict"); box.className = "verdict " + v.cls;
+  setHTML("c-verdict", `<div class="v">${esc(v.text)}</div><p class="d"><b>${esc(v.why)}</b><br>${tax}<br>국내 기준가 <b>${e.kr ? won(e.kr) : "미입력"}</b>${oth}${wl}</p>${spec}`);
+
+  const tfMsg = !c.taxfree ? "면세 매장 아님" : cd.elig ? `환급 ${Math.round(k.jct*100)}%${c.feePct ? ` − 수수료 ${c.feePct}%` : ""}` : `세전 ¥${fmt(cd.groupEx)} · ¥5,000 미만이라 환급 없음`;
+  setHTML("c-money", c.yen>0 ? `<div><span>먼저 결제</span><b>${won(cd.paidKRW)}</b><span>¥${fmt(cd.paid)}</span></div>
+    <div><span>예상 환급</span><b>${cd.refund ? "−" + won(cd.refundKRW) : "0원"}</b><span>${tfMsg}</span></div>
+    <div class="is-final"><span>실제 부담</span><b>${won(cd.cost)}</b><span>¥${fmt(cd.net)}</span></div>` : "");
+
+  // 손익분기: 판정과 같은 계산식(수량·리스트·한도·감면·지갑 포함)을 오늘 환율만 바꿔 가며 찾음
+  let be = "";
+  if (c.yen>0 && c.kr>0 && !e.sepOver){
+    const b = breakEven(m => evalCandidate(c, c.person, m, S.declare).save);
+    const tail = walletOn() ? " 지갑 엔화로 내는 부분은 이미 바꾼 환율 그대로예요." : "";
+    if (b.never) be = "환율이 아무리 내려가도 국내 구매가 더 싸요.";
+    else if (b.always) be = "환율이 100엔당 3,000원이 돼도 일본 구매가 더 싸요." + tail;
+    else be = (b.r >= r ? `손익분기 환율은 100엔당 ${fmt(b.r)}원이에요. 지금(${Math.round(r)}원)보다 이만큼 올라도 일본이 더 싸요.`
+                        : `손익분기 환율은 100엔당 ${fmt(b.r)}원이에요. 지금(${Math.round(r)}원)보다 내려가야 일본이 더 싸요.`) + tail;
+  }
+  setText("c-break", be);
+  const cs = $("c-coupon-save");
+  if (c.coupon > 0 && c.yen > 0){
+    const e0 = evalCandidate({...c, coupon:0}, c.person, r, S.declare);
+    cs.textContent = `쿠폰 ${c.coupon}% 덕분에 ${won(e.save - e0.save)} 덜 들어요.`; cs.hidden = false;
+  } else cs.hidden = true;
+
+  $("c-wallet").disabled = !wr;
+  $("c-wallet").checked = S.useWallet && !!wr;
+  setText("c-wallet-info", wr ? `(100엔 ${wr.toFixed(1)}원 · 리스트 결제 후 남은 엔화 ¥${fmt(Math.max(0, S.wallet.yen - cartEntries().reduce((a,x)=>a+paidYen(x.it)*x.q,0)))})` : "(출국 전 탭에서 환전 기록을 넣으면 켤 수 있어요)");
+  $("c-naver").href = naverURL(c.name);
+
+  const pk = [c.store, v.cls, c.name].join("|");
+  if (pk !== pathsKey){
+    pathsKey = pk;
+    const st = ci.st, jpRec = v.cls==="is-good" ? " is-recommended" : "", krRec = v.cls==="is-bad" ? " is-recommended" : "";
+    const jp = st.link
+      ? `<a class="path-btn${jpRec}" href="${st.link}" target="_blank" rel="noopener"><span class="t">${st.l} 쿠폰 받기 ↗</span><span class="s">일본에서 사기${jpRec?" · 유리":""}</span></a>`
+      : `<button class="path-btn${jpRec}" type="button" aria-disabled="true" data-act="nolink"><span class="t">${st.l}</span><span class="s">일본에서 사기 · 연결할 쿠폰 페이지 없음</span></button>`;
+    const kr = `<a class="path-btn${krRec}" href="${naverURL(c.name)}" target="_blank" rel="noopener"><span class="t">국내 판매가 보기 ↗</span><span class="s">한국에서 사기 · 네이버 쇼핑${krRec?" · 유리":""}</span></a>`;
+    $("c-paths").innerHTML = jp + kr;
+  }
+}
+// 상품 이름이 바뀌면: 정확한 모델이면 등록 기준가를 채우고, 등록 상품에서 다른 이름으로 바뀌면 이전 한국 가격을 지움
+function onName(){
+  const {item, near} = matchName($("c-name").value);
+  const prev = matchId; matchId = item ? item.id : null;
+  $("c-picks").querySelectorAll(".pick").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.id === matchId)));
+  if (item){
+    if (item.id !== prev){ krTouched = false; couponTouched = false; }
+    if (!krTouched) $("c-kr").value = item.kr;
+    if (!yenTouched || item.id !== prev){ $("c-yen").value = item.yen; yenTouched = false; }
+    $("c-cat").value = item.cat; if (item.ml) $("c-ml").value = item.ml;
+    setText("c-match", "등록 상품 ✓");
+    setText("c-kr-src", krTouched ? "직접 입력" : "등록 기준가");
+    setText("c-yen-src", yenTouched ? "" : `${item.jpSrc} · 가격표와 다르면 고치세요`);
+    $("c-suggest").hidden = true;
+  } else {
+    if (prev && !krTouched) $("c-kr").value = "";            // 다른 상품의 국내가·참고 엔화를 그대로 쓰지 않음
+    if (prev && !yenTouched) $("c-yen").value = "";
+    if (prev) setText("c-yen-src", "");
+    setText("c-match", "등록 안 된 상품");
+    setText("c-kr-src", $("c-kr").value === "" ? "직접 확인해 넣어 주세요" : "직접 입력");
+    const sg = $("c-suggest");
+    if (near){ sg.innerHTML = `등록 상품 중 비슷한 건 <b>${esc(near.name)}</b>이에요. 모델이 다르면 등록 가격을 쓰지 않으니 국내 판매가를 직접 넣어 주세요. <button class="btn btn-sm" type="button" data-act="pick" data-id="${near.id}">이 모델이 맞아요</button>`; sg.hidden = false; }
+    else sg.hidden = true;
+  }
+}
+
+/* ---------- 참고 상품 ---------- */
+function buildItems(){
+  $("items").innerHTML = ITEMS.map(i => `<article class="item" data-id="${i.id}">
+    <div><h3>${esc(i.name)}</h3>
+      <p class="meta">¥${fmt(i.yen)} · 국내 ${won(i.kr)} · ${esc(KINDS[i.cat].l)}</p></div>
+    <div class="save"><b data-k="save"></b><span class="muted" data-k="v"></span>
+      <div class="acts"><span class="chip chip-accent" data-k="cnt" hidden></span><button class="btn btn-sm" type="button" data-act="add">담기</button></div></div>
+    <div class="extra"><p class="src">출처: ${esc(i.jpSrc)} / ${esc(i.krSrc)} · ${esc(i.checked)} 확인</p>
+      ${i.note ? `<p class="meta">${esc(i.note)}</p>` : ""}
+      ${i.spec ? `<p class="spec">⚠ 사양 차이 있음 · ${esc(i.spec)}</p>` : ""}</div>
+  </article>`).join("");
+}
+function renderItems(){
+  const r = S.jpy;
+  for (const el of $("items").children){
+    const i = ITEMS.find(x=>x.id===el.dataset.id), e = evalCandidate(i, 0, r, S.declare, {noWallet:true}), v = verdictOf(e.save, e.kr, e.sepOver);
+    for (const k of ["is-good","is-bad","is-even","is-check"]) el.classList.toggle(k, k===v.cls);
+    el.querySelector('[data-k="save"]').textContent = signed(e.save);
+    el.querySelector('[data-k="v"]').textContent = v.text + (e.add>0 && v.cls==="is-good" ? ` · 세금 ${gap(e.add)} 포함` : "");
+    const n = S.lines.filter(l=>l.itemId===i.id).reduce((a,l)=>a+l.qty, 0), cnt = el.querySelector('[data-k="cnt"]');
+    cnt.hidden = !n; cnt.textContent = `담김 ×${n}`;
+  }
+}
+
+/* ---------- 쇼핑 리스트 ---------- */
+function personOptions(sel){ let h=""; for (let p=1; p<=S.people; p++) h += `<option value="${p}"${p===sel?" selected":""}>${personLabel(p)}</option>`; return h; }
+function buildPersons(){
+  let h = "";
+  for (let p=1; p<=S.people; p++){
+    const lines = S.lines.filter(l=>l.person===p);
+    h += `<div class="person" data-p="${p}">
+      <div class="between"><b>${S.people>1 ? personLabel(p) : "내 면세 한도"}</b><span class="chip" data-k="chip"></span></div>
+      <div class="gauge" data-k="gauge"><i class="g-dfs"></i><i class="g-shop"></i></div>
+      <div class="between"><span class="small muted" data-k="use"></span>
+        <label class="dfs-input">면세점 구매 $<input type="number" min="0" max="10000" step="10" inputmode="numeric" data-act="dfs" data-p="${p}" value="${S.dfs[p-1]||0}" aria-label="${personLabel(p)} 출국장·시내 면세점 구매액(달러)"></label></div>
+      ${lines.map(l => { const it = itemById(l.itemId); return `<div class="line" data-uid="${l.uid}">
+        <div><div class="name">${esc(it.name)}</div><div class="sub" data-k="sub"></div></div>
+        <div class="ctrls">
+          <span class="seg" role="group" aria-label="${esc(it.name)} 어디서 살지"><button type="button" data-act="jp">일본</button><button type="button" data-act="kr">한국</button></span>
+          <span class="qty"><button type="button" data-act="dec" aria-label="${esc(it.name)} 수량 줄이기">−</button><span data-k="q"></span><button type="button" data-act="inc" aria-label="${esc(it.name)} 수량 늘리기">+</button></span>
+          ${S.people>1 ? `<select data-act="move" aria-label="${esc(it.name)} 누구 물건인지">${personOptions(p)}</select>` : ""}
+          <button class="btn btn-ghost btn-sm" type="button" data-act="del" aria-label="${esc(it.name)} 빼기">×</button></div>
+      </div>`; }).join("")}
+      <p class="small muted" data-k="foot"></p>
+    </div>`;
+  }
+  $("persons").innerHTML = h;
+}
+function renderCart(ev){
+  const r = S.jpy;
+  const key = S.people + "|" + S.lines.map(l=>l.uid+":"+l.person).join(",");
+  if (key !== structKey){ buildPersons(); structKey = key; }
+  const tot = {paid:0, refund:0, cost:0, extra:0, taxAll:0, kr:0, save:0, krOnly:0, nJp:0, nKr:0, unknown:false};
+  for (const el of $("persons").children){
+    const p = +el.dataset.p, s = personSummary(p, r, S.declare, ev), dfs = S.dfs[p-1]||0, used = s.t.usd;
+    tot.paid += s.paid; tot.refund += s.refund; tot.cost += s.cost; tot.extra += s.extra; tot.taxAll += s.t.tax; tot.kr += s.kr; tot.save += s.save;
+    tot.krOnly += s.krOnlySum; tot.nJp += s.mine.length; tot.nKr += s.krOnly.length; tot.unknown = tot.unknown || s.unknown;
+    const dW = Math.min(100, dfs/LIM_USD*100), g = el.querySelector('[data-k="gauge"]');
+    g.children[0].style.width = dW + "%"; g.children[1].style.width = Math.max(0, Math.min(100-dW, s.shopUSD/LIM_USD*100)) + "%";
+    g.classList.toggle("is-over", used > LIM_USD);
+    el.querySelector('[data-k="use"]').textContent = `${usd(used)} / $800${dfs ? ` (면세점 ${usd(dfs)} 포함)` : ""}`;
+    const chip = el.querySelector('[data-k="chip"]');
+    if (s.unknown){ chip.className = "chip chip-warn"; chip.textContent = "별도 한도 초과 · 신고"; }
+    else if (s.t.over > 0){ chip.className = "chip chip-bad"; chip.textContent = `${usd(s.t.over)} 초과 · 신고`; }
+    else { chip.className = "chip chip-good"; chip.textContent = `${usd(LIM_USD - used)} 남음`; }
+    el.querySelector('[data-k="foot"]').textContent = [
+      s.t.over>0 ? `초과 ${usd(s.t.over)} → 예상 세금 ${won(s.t.tax)}${S.declare && s.t.cut ? ` (자진신고 감면 ${won(s.t.cut)})` : ""}` : (s.mine.length ? "일반 물건 입국 세금 0원" : ""),
+      ...s.sep.msgs].filter(Boolean).join(" · ");
+    for (const ln of el.querySelectorAll(".line")){
+      const l = S.lines.find(x=>x.uid===ln.dataset.uid); if (!l) continue;
+      const it = itemById(l.itemId), row = ev.rows.find(x=>x.l && x.l.uid===l.uid), st = it.custom ? STORES[it.store].l : "참고가·단독 환급 판단";
+      ln.classList.toggle("is-kr", l.buy==="kr");
+      ln.querySelector('[data-act="jp"]').setAttribute("aria-pressed", String(l.buy!=="kr"));
+      ln.querySelector('[data-act="kr"]').setAttribute("aria-pressed", String(l.buy==="kr"));
+      ln.querySelector('[data-k="sub"]').textContent = row
+        ? `¥${fmt(paidYen(it))}${it.coupon ? ` (쿠폰 ${it.coupon}%)` : ""}${it.custom ? ` · ${st}` : ""}${row.elig ? "" : " · 환급 없음"} · 실부담 ${won(row.cost)} · 국내가 ${won(row.kr)}`
+        : `한국에서 살 것 · 국내 기준가 ${won(it.kr*l.qty)}`;
+      ln.querySelector('[data-k="q"]').textContent = l.qty;
+      ln.querySelector('[data-act="dec"]').disabled = l.qty <= 1;
+      ln.querySelector('[data-act="inc"]').disabled = l.qty >= 99;
+    }
+  }
+  const has = S.lines.length > 0;
+  $("cart-empty").hidden = has; $("cart-body").hidden = !has; $("opt-btn").disabled = !has;
+  setText("t-jp-n", `${tot.nJp}건`);
+  setText("t-paid", won(tot.paid)); setText("t-refund", tot.refund ? "−" + won(tot.refund) : "0원"); setText("t-pay", won(tot.cost));
+  setText("t-tax", won(tot.extra) + (tot.unknown ? " + 미산정" : "")); setText("t-tax-all", won(tot.taxAll) + (tot.unknown ? " + 미산정" : ""));
+  setText("t-kr", won(tot.kr));
+  setText("t-kr-only", tot.nKr ? `한국에서 살 것 ${tot.nKr}건 · 국내 기준가 ${won(tot.krOnly)} (차액 계산에서 빠져요)` : "");
+  setText("t-saved", (tot.save>=0 ? "+" : "−") + won(Math.abs(tot.save)) + (tot.unknown ? " (미산정 세금 제외 전)" : ""));
+  $("t-saved").classList.toggle("is-bad", tot.save < 0);
+  $("t-unknown").hidden = !tot.unknown;
+  return tot;
+}
+
+/* ---------- 귀국 전 ---------- */
+function renderDecl(ev){
+  const r = S.jpy; let h = "";
+  for (let p=1; p<=S.people; p++){
+    const s = personSummary(p, r, S.declare, ev), dfs = S.dfs[p-1]||0, t1 = personTax(s.parts, true, dfs);
+    const names = s.mine.map(x => `${esc(x.it.name)}${x.q>1 ? ` ×${x.q}` : ""}`).join(", ") || "일본에서 산 물건 없음";
+    h += `<article class="receipt"><div class="head"><b>${personLabel(p)}</b><span class="chip ${s.need?"chip-bad":"chip-good"}">${s.need?"신고해야 해요":"신고 안 해도 돼요"}</span></div>
+      <p class="items-mini">${names}</p>
+      <div class="row"><span>일본 구매 (세관 기준가, 예상)</span><b>${usd(s.shopUSD)}</b></div>
+      <div class="row"><span>면세점 구매</span><b>${usd(dfs)}</b></div>
+      <div class="row"><span>합계 / 면세 한도</span><b>${usd(s.t.usd)} / $800</b></div>
+      ${s.t.over > 0 ? `<div class="row"><span>초과 금액</span><b>${usd(s.t.over)}</b></div>
+      <div class="row"><span>자진신고하면 예상 세금</span><b>${won(t1.tax)}</b></div>
+      ${t1.cut ? `<div class="row"><span class="muted">└ 자진신고 감면</span><b class="muted">−${won(t1.cut)}</b></div>` : ""}
+      <div class="row"><span>신고 안 하고 걸리면 (가산세 40%)</span><b>${won(t1.full*(1+PENALTY))}</b></div>` : ""}
+      ${s.unknown ? `<div class="row"><span>주류·향수 세금</span><b>미산정 · 신고 대상</b></div>` : ""}
+      ${s.sep.msgs.map(m => `<p class="note${s.sep.ok ? "" : " note-warn"}">${esc(m)}</p>`).join("")}
+    </article>`;
+  }
+  setHTML("decl", h);
+}
+
+function renderShare(){
+  const r = S.jpy;
+  const list = ITEMS.map(i => ({i, e:evalCandidate(i, 0, r, true, {noWallet:true})}))
+    .filter(x => verdictOf(x.e.save, x.e.kr, x.e.sepOver).cls==="is-good").sort((a,b) => b.e.save - a.e.save).slice(0,5);
+  const text = `[환율타이밍] 일본 쇼핑 참고 TOP ${list.length} (100엔 ${Math.round(r)}원 기준)\n` +
+    list.map((x,k) => `${k+1}. ${x.i.name} — 국내 기준가보다 ${gap(x.e.save)} 적게 들어요${x.i.spec ? " (사양 차이 있음)" : ""}`).join("\n") +
+    `\n※ 혼자 샀을 때 · 1인 면세 한도 $800 · 쿠폰·환급 반영 예상치. 매장 가격은 다를 수 있어요`;
+  if ($("share-text").value !== text) $("share-text").value = text;
+}
+
+function renderMini(ev, tot){
+  const p = curPerson(), s = personSummary(p, S.jpy, S.declare, ev);
+  setText("mb-label", S.people>1 ? `${personLabel(p)} 면세 한도` : "내 면세 한도");
+  setText("mb-used", `${usd(s.t.usd)} / $800`);
+  $("mb-gauge").style.width = Math.min(100, s.t.usd/LIM_USD*100) + "%";
+  $("mb-gauge-wrap").classList.toggle("is-over", s.t.usd > LIM_USD);
+  setText("mb-saved", signed(tot.save) + (tot.unknown ? "*" : ""));
+  $("minibar").hidden = S.tab !== "during";
+}
+
+function renderAll(){
+  const ev = evalLines(S.jpy);
+  renderTrip(); renderBefore(); renderCalc(); renderItems();
+  const tot = renderCart(ev);
+  renderDecl(ev); renderShare(); renderMini(ev, tot);
+  save();
+}
+
+/* ================= 동작 ================= */
+function setTab(t){
+  S.tab = t;
+  for (const k of ["before","during","after"]){
+    const b = $("tab-"+k); b.setAttribute("aria-selected", String(k===t)); b.tabIndex = k===t ? 0 : -1;
+    $("p-"+k).hidden = k !== t;
+  }
+  $("minibar").hidden = t !== "during";
+  save();
+}
+function fillPersonSelect(){ $("c-person").innerHTML = personOptions(curPerson()); }
+function setPeople(n){
+  n = clamp(Math.round(n), 1, 6); if (n === S.people) return;
+  let moved = 0;
+  S.lines.forEach(l => { if (l.person > n){ l.person = n; moved++; } });
+  for (let k=n; k<6; k++) S.dfs[k] = 0;
+  S.people = n; S.person = clamp(S.person, 1, n);
+  fillPersonSelect();
+  if (moved) toast(`줄어든 인원의 물건 ${moved}건을 ${personLabel(n)}에게 옮겼어요. 한도를 다시 확인하세요.`);
+  renderAll();
+}
+function addLine(itemId, person, qty){
+  const ex = S.lines.find(l => l.itemId===itemId && l.person===person);
+  if (ex){ ex.qty = clamp(ex.qty + qty, 1, 99); return ex; }
+  S.lines.push({uid:uid(), itemId, person, qty, buy:"jp"}); return null;
+}
+function applyStoreDefaults(){
+  const st = STORES[$("c-store").value];
+  $("c-taxfree").checked = st.taxfree;
+  if (!feeTouched) $("c-feepct").value = st.feePct;
+}
+function addFromCalc(){
+  const c = readCalc();
+  if (c.yen <= 0){ setText("c-msg", "가격표 금액을 넣어 주세요."); return; }
+  if (!c.kr){ setText("c-msg", "국내 판매가를 넣어야 비교할 수 있어요. 비교 없이 담으려면 0보다 큰 값을 넣어 주세요."); $("c-kr").focus(); return; }
+  const {person, ...item} = c, sig = JSON.stringify(item);
+  const same = S.lines.find(l => l.person===person && S.custom[l.itemId] && JSON.stringify(S.custom[l.itemId])===sig);
+  if (same) same.qty = clamp(same.qty + c.qty, 1, 99);
+  else { const id = "c_" + uid(); S.custom[id] = item; S.lines.push({uid:uid(), itemId:id, person, qty:c.qty, buy:"jp"}); }
+  const msg = `‘${c.name}’ ${c.qty}개를 ${S.people>1 ? personLabel(person)+" " : ""}리스트에 담았어요${same ? ` (이제 ${same.qty}개)` : ""}.`;
+  setText("c-msg", msg); toast(msg); pulse(); renderAll();
+}
+function addItem(id){
+  const p = curPerson(), it = ITEMS.find(i=>i.id===id), ex = addLine(id, p, 1);
+  toast(`‘${it.name}’을 ${S.people>1 ? personLabel(p)+" " : ""}리스트에 담았어요${ex ? ` (이제 ${ex.qty}개)` : ""}.`); pulse(); renderAll();
+}
+function runOptimize(){
+  const r = S.jpy, out = [];
+  for (let p=1; p<=S.people; p++){
+    if (!S.lines.some(l=>l.person===p)) continue;
+    const o = optimizeSplit(p, r, S.declare);
+    out.push(`${S.people>1 ? personLabel(p)+": " : ""}일본 ${o.jp}건 · 한국 ${o.kr}건${o.v>0 ? ` (국내 기준가 대비 ${gap(o.v)})` : ""}${o.skipped ? ` · 물건이 12개를 넘어 앞의 12개만 비교했고 나머지 ${o.skipped}개는 그대로 뒀어요` : ""}`);
+  }
+  toast(out.length ? `리스트 안에서 비교했어요. ${out.join(" / ")}` : "리스트가 비어 있어요.");
+  renderAll();
+}
+function loadSample(){
+  S.lines = [{uid:uid(), itemId:"whxm6", person:1, qty:1, buy:"jp"}, {uid:uid(), itemId:"onitsuka", person:1, qty:1, buy:"jp"}];
+  toast("예시 상품 2개를 담았어요. 지우려면 ×를 누르세요."); renderAll();
+}
+
+/* ---------- 이용 통계 (선택) ----------
+   GoatCounter 주소를 넣으면 켜져요. 쿠키·로그인·개인정보 없이 "어떤 버튼을 몇 번 눌렀는지"만 세요. 비어 있으면 아무것도 보내지 않아요. */
+const GOATCOUNTER = "";   // 예: "https://hwanyul.goatcounter.com/count"
+if (GOATCOUNTER && /^https:\/\//.test(location.href)){
+  const sc = document.createElement("script"); sc.async = true; sc.src = "https://gc.zgo.at/count.js"; sc.dataset.goatcounter = GOATCOUNTER; document.head.appendChild(sc);
+}
+function track(name){ try{ if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({path:"event/" + name, title:name, event:true}); }catch(e){} }
+
+/* ---------- 공유: 휴대폰에선 공유 창(카카오톡 포함), PC에선 복사 ---------- */
+async function shareText(text, msgId){
+  const url = /^https?:/.test(location.href) && !/claudeusercontent|claude\.ai/.test(location.host) ? location.href.split("?")[0] : "";
+  const body = url ? `${text}\n${url}` : text;
+  try{
+    if (navigator.share){ await navigator.share({title:"환율타이밍", text: body}); track("share"); return; }
+  }catch(e){ if (e && e.name === "AbortError") return; }
+  try{ await navigator.clipboard.writeText(body); }catch(e){ const t = document.createElement("textarea"); t.value = body; document.body.appendChild(t); t.select(); try{ document.execCommand("copy"); }catch(_){} t.remove(); }
+  track("share-copy");
+  if (msgId) setText(msgId, "복사했어요. 카톡에 붙여 넣으세요."); else toast("복사했어요. 카톡에 붙여 넣으세요.");
+}
+function cartShareText(){
+  const r = S.jpy, ev = evalLines(r);
+  const lines = [`[환율타이밍] ${S.city} 쇼핑 리스트 (100엔 ${Math.round(r)}원 기준)`];
+  for (let p=1; p<=S.people; p++){
+    const s = personSummary(p, r, S.declare, ev);
+    const items = S.lines.filter(l=>l.person===p).map(l => { const it = itemById(l.itemId); return `· ${it.name}${l.qty>1?` ×${l.qty}`:""} — ${l.buy==="kr"?"한국에서":"일본에서"}`; });
+    if (!items.length && !S.dfs[p-1]) continue;
+    lines.push(`\n${personLabel(p)} · 한도 ${usd(s.t.usd)} / $800${s.need ? " · 신고 필요" : ""}`, ...items);
+  }
+  return lines.join("\n") + "\n※ 예상치예요. 1인 면세 한도는 합산되지 않아요.";
+}
+
+/* ---------- 실시간 환율 (ECB 기준환율, Frankfurter · 키 없음) ----------
+   6시간에 한 번만 받고, 실패하면 마지막 저장값으로 계산. 사용자가 직접 고친 값은 덮어쓰지 않음 */
+const FX_URLS = ["https://api.frankfurter.dev/v1/latest?base=USD&symbols=KRW,JPY", "https://api.frankfurter.app/latest?from=USD&to=KRW,JPY"];
+async function fetchFx(force){
+  if (!force && S.fx && Date.now() - S.fx.fetchedAt < 6*3600e3){ fxStatus = "live"; return; }
+  if (!navigator.onLine){ fxStatus = S.fx ? "cached" : "offline"; renderAll(); return; }
+  fxStatus = "loading"; renderTrip();
+  for (const url of FX_URLS){
+    try{
+      const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 5000);
+      const res = await fetch(url, {signal:ctl.signal}); clearTimeout(tm);
+      if (!res.ok) continue;
+      const d = await res.json(), krw = d && d.rates && +d.rates.KRW, jpy = d && d.rates && +d.rates.JPY;
+      const rate = krw / jpy * 100;
+      if (!(krw > 800 && krw < 3000 && rate > 500 && rate < 1500)) continue;   // 이상한 값은 버림
+      S.fx = {rate, usd:krw, date:String(d.date||"").slice(0,10), fetchedAt:Date.now()};
+      if (force){ S.jpyEdited = false; S.usdEdited = false; }
+      if (!S.jpyEdited){ S.jpy = clamp(rate, 700, 1000); $("jpy").value = Math.round(S.jpy); }
+      if (!S.usdEdited){ S.usd = USD = Math.round(krw*10)/10; $("usd").value = S.usd; }
+      fxStatus = "live";
+      if (force) toast(`환율을 새로 받았어요: 100엔 ${rate.toFixed(2)}원, 1달러 ${krw.toFixed(1)}원 (${S.fx.date} ECB)`);
+      renderAll(); return;
+    }catch(e){}
+  }
+  fxStatus = S.fx ? "cached" : "fail";
+  if (force) toast("실시간 환율을 받지 못했어요. 저장된 값으로 계산해요.");
+  renderAll();
+}
+function applyTheme(t){
+  S.theme = t; document.documentElement.dataset.theme = t;
+  $("theme-btn").textContent = t === "retro" ? "기본 테마로 보기" : "레트로 테마";
+  save();
+}
+function resetCalc(){
+  $("c-name").value = ""; $("c-yen").value = ""; $("c-kr").value = ""; $("c-qty").value = 1;
+  krTouched = false; yenTouched = false; couponTouched = false; matchId = null;
+  onName(); setText("c-match", ""); setText("c-kr-src", ""); setText("c-msg", "");
+  renderCalc(); $("c-name").focus();
+}
+
+function init(){
+  if (params.get("tab") && ["before","during","after"].includes(params.get("tab"))) S.tab = params.get("tab");
+  $("c-store").innerHTML = Object.entries(STORES).map(([k,s]) => `<option value="${k}">${s.l}</option>`).join("");
+  $("c-cat").innerHTML = Object.entries(KINDS).map(([k,c]) => `<option value="${k}">${c.l}</option>`).join("");
+  $("c-names").innerHTML = ITEMS.map(i => `<option value="${esc(i.name)}"></option>`).join("");
+  $("city").value = S.city; $("date").value = S.date; $("nights").value = S.nights; $("people").value = S.people; $("jpy").value = S.jpy;
+  $("ex-yen").value = S.exchange; $("alert-jpy").value = S.alert.target;
+  $("w-yen").value = S.wallet.yen || ""; $("w-krw").value = S.wallet.krw || "";
+  $("declare").checked = S.declare;
+  $("usd").value = S.usd;
+  $("c-picks").innerHTML = ITEMS.map(i => `<button class="pick" type="button" data-id="${i.id}" aria-pressed="false">${esc(i.short)}</button>`).join("");
+  applyTheme(S.theme);
+  fillPersonSelect(); buildItems(); applyStoreDefaults(); onName();
+
+  // 여행 설정
+  $("city").addEventListener("change", e => { S.city = e.target.value; renderAll(); });
+  $("date").addEventListener("change", e => { S.date = e.target.value; renderAll(); });
+  $("people").addEventListener("input", () => { if ($("people").value !== "") setPeople(readNum("people",1,6,S.people)); });
+  $("people").addEventListener("change", () => { setPeople(fixField("people",1,6,S.people,true)); });
+  $("jpy").addEventListener("input", () => { S.jpy = readNum("jpy",700,1000,836); S.jpyEdited = Math.round(S.jpy) !== Math.round(fxBase().rate); renderAll(); });
+  $("usd").addEventListener("input", () => { if ($("usd").value === "") return; S.usd = USD = readNum("usd",1000,2000,1338); S.usdEdited = true; renderAll(); });
+  $("usd").addEventListener("change", () => { S.usd = USD = fixField("usd",1000,2000,1338,false); renderAll(); });
+  $("fx-refresh").addEventListener("click", () => fetchFx(true));
+  $("theme-btn").addEventListener("click", () => applyTheme(S.theme === "retro" ? "modern" : "retro"));
+  $("c-reset").addEventListener("click", resetCalc);
+  $("c-picks").addEventListener("click", e => {
+    const b = e.target.closest(".pick"); if (!b) return;
+    $("c-name").value = ITEMS.find(i => i.id === b.dataset.id).name; krTouched = false; yenTouched = false; setText("c-msg", "");
+    onName(); renderCalc();
+  });
+
+  // 탭 (좌우 화살표로도 이동)
+  const order = ["before","during","after"];
+  order.forEach(k => $("tab-"+k).addEventListener("click", () => setTab(k)));
+  document.querySelector(".tabs").addEventListener("keydown", e => {
+    if (e.key!=="ArrowRight" && e.key!=="ArrowLeft") return;
+    const k = order[(order.indexOf(S.tab) + (e.key==="ArrowRight" ? 1 : 2)) % 3]; setTab(k); $("tab-"+k).focus();
+  });
+
+  // 출국 전
+  $("ex-yen").addEventListener("input", () => { S.exchange = readNum("ex-yen",0,1e7,0); renderAll(); });
+  $("ex-yen").addEventListener("change", () => fixField("ex-yen",0,1e7,0,true));
+  $("alert-jpy").addEventListener("input", () => { S.alert.target = Math.round(readNum("alert-jpy",500,1500,840)); renderAll(); });
+  $("alert-jpy").addEventListener("change", () => fixField("alert-jpy",500,1500,840,true));
+  $("alert-btn").addEventListener("click", () => { S.alert.on = !S.alert.on; toast(S.alert.on ? "환율 알림을 켰어요 (데모)" : "환율 알림을 껐어요"); renderAll(); });
+  const onWallet = () => { S.wallet = {yen:readNum("w-yen",0,1e8,0), krw:readNum("w-krw",0,1e10,0)}; if (walletRate()) S.useWallet = true; renderAll(); };
+  $("w-yen").addEventListener("input", onWallet); $("w-krw").addEventListener("input", onWallet);
+  $("w-yen").addEventListener("change", () => fixField("w-yen",0,1e8,0,true)); $("w-krw").addEventListener("change", () => fixField("w-krw",0,1e10,0,true));
+  $("w-fill").addEventListener("click", () => { $("w-yen").value = 100000; $("w-krw").value = 840000; onWallet(); toast("지갑 환율 100엔 840원으로 채웠어요. 실제 부담 계산에만 쓰여요."); });
+  $("share-btn").addEventListener("click", () => shareText($("share-text").value, "copy-msg"));
+  $("cart-share").addEventListener("click", () => shareText(cartShareText()));
+  document.addEventListener("click", e => {   // 통계: 바깥 링크·주요 버튼만
+    const a = e.target.closest("a[href^='http']"); if (a) track("out/" + new URL(a.href).hostname);
+    const b = e.target.closest("#c-add,#opt-btn,#sample-btn,#theme-btn,#c-reset,.pick,[data-act='add']"); if (b) track("btn/" + (b.id || b.dataset.act || "pick"));
+  });
+  $("copy-btn").addEventListener("click", async () => {
+    const ta = $("share-text");
+    try { await navigator.clipboard.writeText(ta.value); } catch(e){ ta.select(); try{ document.execCommand("copy"); }catch(_){} }
+    setText("copy-msg", "복사했어요. 단톡방에 붙여 넣어 보세요.");
+  });
+  $("nights").addEventListener("input", () => { if ($("nights").value === "") return; S.nights = Math.round(readNum("nights",1,30,3)); renderAll(); });
+  $("nights").addEventListener("change", () => { S.nights = fixField("nights",1,30,3,true); renderAll(); });
+
+  // 매장 계산기: 입력이 바뀌면 이전 "담았어요" 문구는 지움
+  ["c-name","c-store","c-cat","c-yen","c-kr","c-qty","c-ml","c-coupon","c-feepct","c-taxfree"].forEach(id => $(id).addEventListener("input", () => setText("c-msg", "")));
+  $("c-name").addEventListener("input", () => { onName(); renderCalc(); });
+  $("c-store").addEventListener("change", () => { couponTouched = false; feeTouched = false; applyStoreDefaults(); renderCalc(); });
+  $("c-cat").addEventListener("change", () => {
+    couponTouched = false; const sep = TAX[KINDS[$("c-cat").value].tax].sep;
+    if (sep==="perfume" && readNum("c-ml",0,5000,0) > 200) $("c-ml").value = 50;
+    if (sep==="liquor" && readNum("c-ml",0,5000,0) < 100) $("c-ml").value = 700;
+    renderCalc();
+  });
+  $("c-yen").addEventListener("input", () => { yenTouched = true; setText("c-yen-src", ""); renderCalc(); });
+  $("c-kr").addEventListener("input", () => { krTouched = true; setText("c-kr-src", "직접 입력"); renderCalc(); });
+  $("c-coupon").addEventListener("input", () => { couponTouched = true; renderCalc(); });
+  $("c-feepct").addEventListener("input", () => { feeTouched = true; renderCalc(); });
+  ["c-qty","c-ml","c-taxfree"].forEach(id => $(id).addEventListener("input", renderCalc));
+  [["c-yen",0,1e7,0,true],["c-qty",1,99,1,true],["c-ml",0,5000,0,true],["c-coupon",0,30,0,false],["c-feepct",0,50,0,false]]
+    .forEach(([id,lo,hi,fb,isInt]) => $(id).addEventListener("change", () => { fixField(id,lo,hi,fb,isInt); renderCalc(); }));
+  $("c-kr").addEventListener("change", () => { if ($("c-kr").value !== "") fixField("c-kr",0,1e8,0,true); renderCalc(); });
+  $("c-person").addEventListener("change", () => { S.person = clamp(int($("c-person").value,1),1,S.people); setText("c-msg",""); renderAll(); });
+  $("c-wallet").addEventListener("change", () => { S.useWallet = $("c-wallet").checked; renderAll(); });
+  $("c-add").addEventListener("click", addFromCalc);
+  $("c-suggest").addEventListener("click", e => {
+    const b = e.target.closest('[data-act="pick"]'); if (!b) return;
+    $("c-name").value = ITEMS.find(i=>i.id===b.dataset.id).name; krTouched = false; yenTouched = false; onName(); renderCalc();
+  });
+  $("c-combo").addEventListener("click", e => {
+    const b = e.target.closest('[data-act="combo"]'); if (!b) return;
+    const p = +b.dataset.p, c = readCalc(), ci = couponInfo(c);
+    let n = 0;
+    ci.same.forEach(x => { if (STORES[x.it.store].rule(x.it.cat, ci.total, x.it.yen/(1+kindOf(x.it).jct)).p >= p && x.it.coupon < p){ x.it.coupon = p; n++; } });
+    $("c-coupon").value = p; couponTouched = true;
+    toast(`한 번에 계산하는 걸로 보고 ${p}%를 적용했어요${n ? `. 이미 담은 같은 매장 물건 ${n}건도 ${p}%로 다시 계산했어요` : ""}.`);
+    renderAll();
+  });
+  $("c-paths").addEventListener("click", e => {
+    if (e.target.closest('[data-act="nolink"]')) toast("이 매장은 연결할 쿠폰 페이지가 없어요. 계산대에서 여권을 보여 주고 면세 수속을 하세요.");
+  });
+
+  // 참고 상품·리스트
+  $("items").addEventListener("click", e => { const b = e.target.closest('[data-act="add"]'); if (b) addItem(b.closest(".item").dataset.id); });
+  $("opt-btn").addEventListener("click", runOptimize);
+  $("sample-btn").addEventListener("click", loadSample);
+  $("declare").addEventListener("change", e => { S.declare = e.target.checked; renderAll(); });
+  const lineOf = el => { const ln = el.closest(".line"); return ln ? S.lines.find(x => x.uid===ln.dataset.uid) : null; };
+  $("persons").addEventListener("click", e => {
+    const b = e.target.closest("button[data-act]"); if (!b) return;
+    const l = lineOf(b); if (!l) return;
+    const act = b.dataset.act;
+    if (act==="inc") l.qty = clamp(l.qty+1, 1, 99);
+    else if (act==="dec") l.qty = clamp(l.qty-1, 1, 99);
+    else if (act==="jp" || act==="kr") l.buy = act;
+    else if (act==="del"){ S.lines = S.lines.filter(x => x !== l); toast(`‘${itemById(l.itemId).name}’을 리스트에서 뺐어요.`); }
+    renderAll();
+  });
+  $("persons").addEventListener("change", e => {
+    const t = e.target;
+    if (t.dataset.act==="move"){ const l = lineOf(t); if (l){ l.person = clamp(int(t.value,1),1,S.people); renderAll(); } }
+    if (t.dataset.act==="dfs"){ const p = +t.dataset.p; S.dfs[p-1] = clamp(num(t.value,0),0,10000); if (t.value !== String(S.dfs[p-1])) t.value = S.dfs[p-1]; renderAll(); }
+  });
+  $("persons").addEventListener("input", e => {
+    const t = e.target; if (t.dataset.act !== "dfs") return;
+    S.dfs[+t.dataset.p - 1] = clamp(num(t.value,0),0,10000); renderAll();
+  });
+
+  setTab(S.tab);
+  renderAll();
+  fetchFx(false);
+}
+init();
+</script>
+</body>
+</html>
