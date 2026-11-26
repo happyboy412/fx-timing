@@ -548,6 +548,13 @@ html[data-theme="retro"] .share-btns{display:flex;gap:8px;flex-wrap:wrap}
 @media (prefers-reduced-motion:reduce){html[data-theme="retro"] .gauge i,html[data-theme="retro"] .toast{transition:none}html[data-theme="retro"] .minibar.is-pulse{animation:none}}
 
 
+/* 국내 최저가 후보 (두 테마 공통) */
+.kr-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.krlist{display:flex;flex-direction:column;gap:6px}
+.kr-opt{display:grid;grid-template-columns:1fr auto;gap:2px 10px;text-align:left;width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.kr-opt .m{grid-column:1/-1;font-size:12px;color:var(--muted)}
+.kr-opt b{white-space:nowrap}
+html[data-theme="retro"] .kr-opt{border:2px solid var(--line);border-radius:0;box-shadow:var(--sh-sm)}
 /* ===== 레트로 테마 (html[data-theme="retro"]일 때만 적용) ===== */
 
 /* ===================== 레트로 픽셀 테마 · 하늘·바다·민트 =====================
@@ -867,6 +874,8 @@ html[data-theme="retro"] .cardtable{border:2px solid var(--line);border-radius:0
             <label class="field">한국 가격 (원) <span class="hint" id="c-kr-src"></span>
               <input id="c-kr" type="number" min="0" max="100000000" step="1000" inputmode="numeric" value="619000" placeholder="국내 판매가">
             </label>
+            <div class="span2 kr-tools"><button class="btn btn-sm btn-ghost" type="button" id="c-krfind">국내 최저가 찾기</button><span class="muted tiny" id="c-krstate"></span></div>
+            <div class="span2 krlist" id="c-krlist" hidden></div>
           </div>
           <p class="note note-warn" id="c-suggest" hidden></p>
           <div class="verdict" id="c-verdict" aria-live="polite"></div>
@@ -1050,6 +1059,11 @@ const ITEMS = [
   {id:"iphone17",short:"아이폰 17",name:"아이폰 17 (256GB)",cat:"apple",yen:159800,kr:1287000,jpSrc:"애플 일본 공식가(인상 후)",krSrc:"애플 국내 출시가(보도)",checked:"2026.11",spec:"일본판은 카메라 셔터음을 끌 수 없어요."},
   {id:"x100vi",short:"X100VI",name:"후지필름 X100VI",cat:"camera",yen:315700,kr:2399000,jpSrc:"일본 공식가(10월 인상 후, 보도)",krSrc:"국내 출시가(보도)",checked:"2026.11",note:"디지털카메라는 관세 0%라 한도를 넘으면 부가세 10%만 계산해요."},
   {id:"switch2",short:"스위치2",name:"닌텐도 스위치2 (일본어 전용판)",cat:"game",yen:49980,kr:758000,jpSrc:"닌텐도 일본 공식가",krSrc:"국내 공식가(9/1 인상)",checked:"2026.11",spec:"일본어 전용판이라 한국어로 바꿀 수 없어요. 국내판과 같은 제품으로 보기 어려워요."},
+  {id:"whip",short:"퍼펙트휩",name:"센카 퍼펙트휩 120g",cat:"beauty",yen:547,kr:9800,jpSrc:"마츠키요 온라인 가격",krSrc:"국내 본사직영 판매가(SSG)",checked:"2026.11",note:"소액이라 같은 매장에서 다른 물건과 합쳐 세전 ¥5,000을 넘겨야 환급돼요."},
+  {id:"biore",short:"비오레 선크림",name:"비오레 UV 아쿠아리치 워터리 에센스 70g",cat:"beauty",yen:968,kr:11000,jpSrc:"마츠키요 온라인 가격",krSrc:"국내 직구 판매가(가격 추적)",checked:"2026.11",note:"국내 정식 판매는 50g 제품이라 70g은 직구가로 비교했어요."},
+  {id:"kyusoku",short:"휴족시간",name:"휴족시간 18매",cat:"etc",yen:1020,kr:0,jpSrc:"빅카메라 공식몰 가격",krSrc:"국내 정식 판매가 미확인",checked:"2026.11",note:"국내 가격을 등록하지 않았어요. 아래 금액보다 국내가 비싸면 일본이 이득이에요."},
+  {id:"roihi",short:"로이히츠보코",name:"로이히츠보코 156매",cat:"med",yen:581,kr:6500,jpSrc:"선드럭 온라인 가격",krSrc:"국내 직구 판매가(가격 추적)",checked:"2026.11",note:"일본 의약품(제3류)이에요. 의약품은 총 6병(넘으면 3개월 복용량)까지 들여올 수 있어요."},
+  {id:"evea",short:"이브A",name:"이브A정 60정",cat:"med",yen:1045,kr:0,jpSrc:"택스프리 온라인 3개 묶음가 기준 1개",krSrc:"국내 정식 판매 없음",checked:"2026.11",note:"국내 정식 판매가 없어 국내가를 등록하지 않았어요. 의약품은 총 6병(넘으면 3개월 복용량)까지예요."},
   {id:"kakubin",short:"가쿠빈",name:"산토리 가쿠빈 700ml",cat:"liquor",ml:700,yen:2101,kr:47500,jpSrc:"일본 권장가(보도)",krSrc:"국내 판매가",checked:"2026.11",note:"술은 $800과 별도 한도(2L·$400)예요. 700ml는 3병(2.1L)부터 한도를 넘어요. 혼자 사면 세전 ¥5,000이 안 돼 환급도 안 돼요."}
 ];
 // 상품 매칭: exact가 정확히 같을 때만 가격을 씀. broad는 "혹시 이 상품?" 안내에만 쓰고 가격은 넣지 않음
@@ -1062,7 +1076,12 @@ const MATCH = [
   {id:"iphone17",exact:["아이폰 17 (256GB)","아이폰 17 256GB","iphone 17 256gb"],broad:["아이폰","iphone"]},
   {id:"x100vi",exact:["후지필름 X100VI","X100VI"],broad:["후지필름","fujifilm","x100"]},
   {id:"switch2",exact:["닌텐도 스위치2 (일본어 전용판)","스위치2 일본어 전용판"],broad:["스위치","switch"]},
-  {id:"kakubin",exact:["산토리 가쿠빈 700ml","가쿠빈 700ml"],broad:["가쿠빈","산토리","suntory"]}
+  {id:"kakubin",exact:["산토리 가쿠빈 700ml","가쿠빈 700ml"],broad:["가쿠빈","산토리","suntory"]},
+  {id:"whip",exact:["센카 퍼펙트휩 120g","퍼펙트휩 120g","퍼펙트 휩 120g","센카 퍼펙트 휩"],broad:["퍼펙트휩","퍼펙트 휩","센카"]},
+  {id:"biore",exact:["비오레 UV 아쿠아리치 워터리 에센스 70g","아쿠아리치 워터리 에센스 70g","비오레 아쿠아리치 70g"],broad:["비오레","아쿠아리치"]},
+  {id:"kyusoku",exact:["휴족시간 18매","휴족시간 18"],broad:["휴족시간","휴족"]},
+  {id:"roihi",exact:["로이히츠보코 156매","로이히 츠보코 156매","동전파스 156매"],broad:["로이히","동전파스","츠보코"]},
+  {id:"evea",exact:["이브A정 60정","이브A 60정","이브 A정 60정"],broad:["이브","eve"]}
 ];
 const norm = s => String(s).toLowerCase().replace(/[\s\-_()·.,/]/g, "");
 
@@ -1176,7 +1195,7 @@ function evalEntries(entries, r, noWallet){
     const eff = f*wr + (1-f)*r;
     return {...x, elig, groupEx:sums[x.key]||0, paid, refund, net, f, eff, cover,
       paidKRW: paid*eff/100, refundKRW: refund*eff/100, cost: net*eff/100,
-      customs: (elig ? x.ex : paid)*r/100, kr:(x.it.kr||0)*x.q};
+      customs: (elig ? x.ex : paid)*r/100, kr:(x.it.kr||0)*x.q, krUnknown: !(x.it.kr > 0)};
   });
   rows.walletLeft = left;
   return rows;
@@ -1208,10 +1227,11 @@ function sepCheck(parts){
 function personSummary(p, r, declare, ev){
   const mine = ev.rows.filter(x=>x.person===p), parts = mine.map(partOf), dfs = S.dfs[p-1]||0;
   const t = personTax(parts, declare, dfs), base = personTax([], declare, dfs), sep = sepCheck(parts);
-  const sum = k => mine.reduce((a,x)=>a+x[k],0);
+  const sum = k => mine.reduce((a,x)=>a+x[k],0), known = mine.filter(x=>!x.krUnknown);
+  const sumK = k => known.reduce((a,x)=>a+x[k],0);
   const krOnly = S.lines.filter(l=>l.person===p && l.buy==="kr").map(l=>({l, it:itemById(l.itemId)})).filter(x=>x.it);
   return {p, mine, parts, t, extra:t.tax-base.tax, sep, unknown:!sep.ok, paid:sum("paidKRW"), refund:sum("refundKRW"), cost:sum("cost"), kr:sum("kr"),
-    save: sum("kr") - sum("cost") - (t.tax-base.tax), krOnly, krOnlySum: krOnly.reduce((a,x)=>a+x.it.kr*x.l.qty,0),
+    save: sumK("kr") - sumK("cost") - (t.tax-base.tax), krUnknownN: mine.length - known.length, krOnly, krOnlySum: krOnly.reduce((a,x)=>a+(x.it.kr||0)*x.l.qty,0),
     shopUSD: parts.filter(x=>!x.sep).reduce((a,x)=>a+x.k,0)/USD, need: t.over>0 || !sep.ok};
 }
 // 후보 물건의 "더하면 얼마나 달라지나"(한계 비용). p=0이면 리스트와 무관하게 혼자 샀을 때
@@ -1227,7 +1247,7 @@ function evalCandidate(c, p, r, declare, opt){
   const sepA = sepCheck(mineA.map(partOf)), sepB = sepCheck(mineB.map(partOf));
   const others = mineA.filter(x=>!x.cand).reduce((a,x)=>a+x.cost,0) - mineB.reduce((a,x)=>a+x.cost,0);
   const isSep = !!taxOf(c).sep, add = isSep ? 0 : tA.tax - tB.tax, kr = (c.kr||0)*q;
-  return {cand, pay:cand.cost, others, add, kr, save: kr - cand.cost - others - add, tA, tB, sepAfter:sepA,
+  return {cand, pay:cand.cost, others, add, kr, beat: cand.cost + others + add, save: kr - cand.cost - others - add, tA, tB, sepAfter:sepA,
           sepOver: isSep && !sepA.ok, walletLeft: after.walletLeft + cand.cover};
 }
 // 손익분기 환율: 판정과 똑같은 함수로 오늘 환율만 바꿔 가며 찾음 (지갑 엔화로 낸 부분은 이미 정해진 환율 그대로)
@@ -1406,7 +1426,9 @@ function renderCalc(){
   setText("c-more-sum", `${ci.st.l} · ${k.l} · ${c.qty}개 · 쿠폰 ${c.coupon}%${c.taxfree ? "" : " · 면세 매장 아님"}${S.people>1 ? ` · ${personLabel(c.person)}` : ""}`);
 
   const e = evalCandidate(c, c.person, r, S.declare);
-  const v = c.yen<=0 ? {cls:"is-check", text:"가격표를 넣어 주세요", why:"눈앞의 가격표(소비세 포함)를 그대로 넣으면 돼요."} : verdictOf(e.save, e.kr, e.sepOver);
+  const v = c.yen<=0 ? {cls:"is-check", text:"가격표를 넣어 주세요", why:"눈앞의 가격표(소비세 포함)를 그대로 넣으면 돼요."}
+          : (!c.kr && !e.sepOver) ? {cls:"is-check", text:`한국에서 ${won(e.beat)}보다 비싸면 일본이 이득이에요`, why:"국내 판매가만 확인해서 넣으면 바로 판정해요."}
+          : verdictOf(e.save, e.kr, e.sepOver);
   const who = S.people>1 ? personLabel(c.person) : "내";
   let tax;
   if (tx.sep) tax = e.sepAfter.msgs.join(" · ");
@@ -1418,7 +1440,7 @@ function renderCalc(){
   const it = matchId ? ITEMS.find(i=>i.id===matchId) : null;
   const spec = it && it.spec ? `<div class="spec">⚠ 사양 차이 있음 · ${esc(it.spec)}</div>` : "";
   const box = $("c-verdict"); box.className = "verdict " + v.cls;
-  setHTML("c-verdict", `<div class="v">${esc(v.text)}</div><p class="d"><b>${esc(v.why)}</b><br>${tax}<br>국내 기준가 <b>${e.kr ? won(e.kr) : "미입력"}</b>${oth}${wl}</p>${spec}`);
+  setHTML("c-verdict", `<div class="v">${esc(v.text)}</div><p class="d"><b>${esc(v.why)}</b><br>${tax}<br>국내 기준가 <b>${e.kr ? won(e.kr) : "미입력"}</b>${c.yen>0 && !e.sepOver ? ` · 손익분기 국내가 <b>${won(e.beat)}</b>` : ""}${oth}${wl}</p>${spec}`);
 
   const tfMsg = !c.taxfree ? "면세 매장 아님" : cd.elig ? `환급 ${Math.round(k.jct*100)}%${c.feePct ? ` − 수수료 ${c.feePct}%` : ""}` : `세전 ¥${fmt(cd.groupEx)} · ¥5,000 미만이라 환급 없음`;
   setHTML("c-money", c.yen>0 ? `<div><span>먼저 결제</span><b>${won(cd.paidKRW)}</b><span>¥${fmt(cd.paid)}</span></div>
@@ -1465,11 +1487,11 @@ function onName(){
   $("c-picks").querySelectorAll(".pick").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.id === matchId)));
   if (item){
     if (item.id !== prev){ krTouched = false; couponTouched = false; }
-    if (!krTouched) $("c-kr").value = item.kr;
+    if (!krTouched) $("c-kr").value = item.kr > 0 ? item.kr : "";
     if (!yenTouched || item.id !== prev){ $("c-yen").value = item.yen; yenTouched = false; }
     $("c-cat").value = item.cat; if (item.ml) $("c-ml").value = item.ml;
     setText("c-match", "등록 상품 ✓");
-    setText("c-kr-src", krTouched ? "직접 입력" : "등록 기준가");
+    setText("c-kr-src", krTouched ? "직접 입력" : item.kr > 0 ? "등록 기준가" : "국내가 미등록 · 확인해서 넣어 주세요");
     setText("c-yen-src", yenTouched ? "" : `${item.jpSrc} · 가격표와 다르면 고치세요`);
     $("c-suggest").hidden = true;
   } else {
@@ -1488,7 +1510,7 @@ function onName(){
 function buildItems(){
   $("items").innerHTML = ITEMS.map(i => `<article class="item" data-id="${i.id}">
     <div><h3>${esc(i.name)}</h3>
-      <p class="meta">¥${fmt(i.yen)} · 국내 ${won(i.kr)} · ${esc(KINDS[i.cat].l)}</p></div>
+      <p class="meta">¥${fmt(i.yen)} · 국내 ${i.kr ? won(i.kr) : "미등록"} · ${esc(KINDS[i.cat].l)}</p></div>
     <div class="save"><b data-k="save"></b><span class="muted" data-k="v"></span>
       <div class="acts"><span class="chip chip-accent" data-k="cnt" hidden></span><button class="btn btn-sm" type="button" data-act="add">담기</button></div></div>
     <div class="extra"><p class="src">출처: ${esc(i.jpSrc)} / ${esc(i.krSrc)} · ${esc(i.checked)} 확인</p>
@@ -1500,9 +1522,9 @@ function renderItems(){
   const r = S.jpy;
   for (const el of $("items").children){
     const i = ITEMS.find(x=>x.id===el.dataset.id), e = evalCandidate(i, 0, r, S.declare, {noWallet:true}), v = verdictOf(e.save, e.kr, e.sepOver);
-    for (const k of ["is-good","is-bad","is-even","is-check"]) el.classList.toggle(k, k===v.cls);
-    el.querySelector('[data-k="save"]').textContent = signed(e.save);
-    el.querySelector('[data-k="v"]').textContent = v.text + (e.add>0 && v.cls==="is-good" ? ` · 세금 ${gap(e.add)} 포함` : "");
+    for (const k of ["is-good","is-bad","is-even","is-check"]) el.classList.toggle(k, k===(i.kr ? v.cls : "is-check"));
+    el.querySelector('[data-k="save"]').textContent = i.kr ? signed(e.save) : won(e.beat);
+    el.querySelector('[data-k="v"]').textContent = i.kr ? v.text + (e.add>0 && v.cls==="is-good" ? ` · 세금 ${gap(e.add)} 포함` : "") : "국내가 이보다 비싸면 이득";
     const n = S.lines.filter(l=>l.itemId===i.id).reduce((a,l)=>a+l.qty, 0), cnt = el.querySelector('[data-k="cnt"]');
     cnt.hidden = !n; cnt.textContent = `담김 ×${n}`;
   }
@@ -1540,7 +1562,7 @@ function renderCart(ev){
   for (const el of $("persons").children){
     const p = +el.dataset.p, s = personSummary(p, r, S.declare, ev), dfs = S.dfs[p-1]||0, used = s.t.usd;
     tot.paid += s.paid; tot.refund += s.refund; tot.cost += s.cost; tot.extra += s.extra; tot.taxAll += s.t.tax; tot.kr += s.kr; tot.save += s.save;
-    tot.krOnly += s.krOnlySum; tot.nJp += s.mine.length; tot.nKr += s.krOnly.length; tot.unknown = tot.unknown || s.unknown;
+    tot.krOnly += s.krOnlySum; tot.krUnknown = (tot.krUnknown||0) + s.krUnknownN; tot.nJp += s.mine.length; tot.nKr += s.krOnly.length; tot.unknown = tot.unknown || s.unknown;
     const dW = Math.min(100, dfs/LIM_USD*100), g = el.querySelector('[data-k="gauge"]');
     g.children[0].style.width = dW + "%"; g.children[1].style.width = Math.max(0, Math.min(100-dW, s.shopUSD/LIM_USD*100)) + "%";
     g.classList.toggle("is-over", used > LIM_USD);
@@ -1559,7 +1581,7 @@ function renderCart(ev){
       ln.querySelector('[data-act="jp"]').setAttribute("aria-pressed", String(l.buy!=="kr"));
       ln.querySelector('[data-act="kr"]').setAttribute("aria-pressed", String(l.buy==="kr"));
       ln.querySelector('[data-k="sub"]').textContent = row
-        ? `¥${fmt(paidYen(it))}${it.coupon ? ` (쿠폰 ${it.coupon}%)` : ""}${it.custom ? ` · ${st}` : ""}${row.elig ? "" : " · 환급 없음"} · 실부담 ${won(row.cost)} · 국내가 ${won(row.kr)}`
+        ? `¥${fmt(paidYen(it))}${it.coupon ? ` (쿠폰 ${it.coupon}%)` : ""}${it.custom ? ` · ${st}` : ""}${row.elig ? "" : " · 환급 없음"} · 실부담 ${won(row.cost)} · 국내가 ${row.krUnknown ? "미등록(차액 계산에서 빠짐)" : won(row.kr)}`
         : `한국에서 살 것 · 국내 기준가 ${won(it.kr*l.qty)}`;
       ln.querySelector('[data-k="q"]').textContent = l.qty;
       ln.querySelector('[data-act="dec"]').disabled = l.qty <= 1;
@@ -1572,7 +1594,7 @@ function renderCart(ev){
   setText("t-paid", won(tot.paid)); setText("t-refund", tot.refund ? "−" + won(tot.refund) : "0원"); setText("t-pay", won(tot.cost));
   setText("t-tax", won(tot.extra) + (tot.unknown ? " + 미산정" : "")); setText("t-tax-all", won(tot.taxAll) + (tot.unknown ? " + 미산정" : ""));
   setText("t-kr", won(tot.kr));
-  setText("t-kr-only", tot.nKr ? `한국에서 살 것 ${tot.nKr}건 · 국내 기준가 ${won(tot.krOnly)} (차액 계산에서 빠져요)` : "");
+  setText("t-kr-only", [tot.nKr ? `한국에서 살 것 ${tot.nKr}건 · 국내 기준가 ${won(tot.krOnly)} (차액 계산에서 빠져요)` : "", tot.krUnknown ? `국내가를 모르는 ${tot.krUnknown}건은 차액 계산에서 빠졌어요.` : ""].filter(Boolean).join(" "));
   setText("t-saved", (tot.save>=0 ? "+" : "−") + won(Math.abs(tot.save)) + (tot.unknown ? " (미산정 세금 제외 전)" : ""));
   $("t-saved").classList.toggle("is-bad", tot.save < 0);
   $("t-unknown").hidden = !tot.unknown;
@@ -1688,6 +1710,29 @@ function runOptimize(){
 function loadSample(){
   S.lines = [{uid:uid(), itemId:"whxm6", person:1, qty:1, buy:"jp"}, {uid:uid(), itemId:"onitsuka", person:1, qty:1, buy:"jp"}];
   toast("예시 상품 2개를 담았어요. 지우려면 ×를 누르세요."); renderAll();
+}
+
+/* ---------- 국내 최저가 자동 검색 (선택) ----------
+   네이버 쇼핑 검색 API를 Cloudflare Worker로 감싼 주소를 넣으면 켜져요 (worker/naver-shop.js, README 참고).
+   API 키는 Worker에만 있고 이 파일에는 들어가지 않아요. 비어 있으면 네이버 쇼핑 검색 페이지를 열어 줘요. */
+const KR_API = "";   // 예: "https://fx-timing-naver.아이디.workers.dev"
+let krTimer = 0, krSeq = 0;
+async function findKR(auto){
+  const q = $("c-name").value.trim();
+  if (q.length < 2){ setText("c-krstate", "상품 이름을 먼저 넣어 주세요."); return; }
+  if (!KR_API){ if (!auto) window.open(naverURL(q), "_blank", "noopener"); return; }
+  const seq = ++krSeq; setText("c-krstate", "국내 최저가를 찾는 중…");
+  try{
+    const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 6000);
+    const res = await fetch(`${KR_API.replace(/\/$/,"")}/shop?q=${encodeURIComponent(q)}`, {signal:ctl.signal}); clearTimeout(tm);
+    if (seq !== krSeq) return;
+    const d = await res.json(); const items = (d.items||[]).filter(i => i.price > 0).slice(0,5);
+    if (!items.length){ setText("c-krstate", "검색 결과가 없어요. 직접 넣어 주세요."); $("c-krlist").hidden = true; return; }
+    $("c-krlist").innerHTML = items.map((i,k) => `<button class="kr-opt" type="button" data-k="${k}" data-price="${i.price}" data-mall="${esc(i.mall||"")}"><span>${esc(i.title)}</span><b>${won(i.price)}</b><span class="m">${esc(i.mall||"")} · 네이버 쇼핑</span></button>`).join("");
+    $("c-krlist").hidden = false;
+    setText("c-krstate", "같은 모델·용량인지 확인하고 골라 주세요.");
+    track("kr-search");
+  }catch(e){ if (seq === krSeq){ setText("c-krstate", "최저가를 불러오지 못했어요. 직접 넣어 주세요."); $("c-krlist").hidden = true; } }
 }
 
 /* ---------- 이용 통계 (선택) ----------
@@ -1826,7 +1871,19 @@ function init(){
 
   // 매장 계산기: 입력이 바뀌면 이전 "담았어요" 문구는 지움
   ["c-name","c-store","c-cat","c-yen","c-kr","c-qty","c-ml","c-coupon","c-feepct","c-taxfree"].forEach(id => $(id).addEventListener("input", () => setText("c-msg", "")));
-  $("c-name").addEventListener("input", () => { onName(); renderCalc(); });
+  $("c-name").addEventListener("input", () => {
+    onName(); renderCalc();
+    $("c-krlist").hidden = true; setText("c-krstate", "");
+    clearTimeout(krTimer);
+    if (KR_API && !matchId && !krTouched) krTimer = setTimeout(() => findKR(true), 700);
+  });
+  $("c-krfind").addEventListener("click", () => findKR(false));
+  $("c-krlist").addEventListener("click", e => {
+    const b = e.target.closest(".kr-opt"); if (!b) return;
+    $("c-kr").value = b.dataset.price; krTouched = true;
+    const t = new Date(); setText("c-kr-src", `네이버 최저가 · ${b.dataset.mall} · ${t.getMonth()+1}/${t.getDate()} ${String(t.getHours()).padStart(2,"0")}:${String(t.getMinutes()).padStart(2,"0")} 확인`);
+    $("c-krlist").hidden = true; setText("c-krstate", ""); renderCalc();
+  });
   $("c-store").addEventListener("change", () => { couponTouched = false; feeTouched = false; applyStoreDefaults(); renderCalc(); });
   $("c-cat").addEventListener("change", () => {
     couponTouched = false; const sep = TAX[KINDS[$("c-cat").value].tax].sep;
