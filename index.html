@@ -562,7 +562,7 @@ html[data-theme="retro"] .pick-tabs button{font-family:var(--pixel)}
 html[data-theme="retro"] .pick-tabs{border-bottom:2px dashed var(--line)}
 html[data-theme="retro"] .pick-tabs button[aria-selected="true"]{border-bottom:3px solid var(--line)}
 /* 국내 최저가 후보 (두 테마 공통) */
-.kr-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.kr-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.sg-opts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .krlist{display:flex;flex-direction:column;gap:6px}
 .kr-opt{display:grid;grid-template-columns:1fr auto;gap:2px 10px;text-align:left;width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
 .kr-opt .m{grid-column:1/-1;font-size:12px;color:var(--muted)}
@@ -1087,15 +1087,15 @@ const ITEMS = [
 ];
 // 상품 매칭: exact가 정확히 같을 때만 가격을 씀. broad는 "혹시 이 상품?" 안내에만 쓰고 가격은 넣지 않음
 const MATCH = [
-  {id:"mba",exact:["맥북 에어 13 (M5)","맥북 에어 13 M5","macbook air 13 m5"],broad:["맥북","macbook"]},
-  {id:"whxm6",exact:["소니 WH-1000XM6","WH-1000XM6"],broad:["소니 헤드폰","1000xm"]},
-  {id:"wfxm6",exact:["소니 WF-1000XM6","WF-1000XM6"],broad:["소니 이어폰","1000xm"]},
+  {id:"mba",exact:["맥북 에어 13 (M5)","맥북 에어 13 M5","macbook air 13 m5"],broad:["맥북","macbook","애플","apple"]},
+  {id:"whxm6",exact:["소니 WH-1000XM6","WH-1000XM6"],broad:["소니","sony","헤드폰","1000xm"]},
+  {id:"wfxm6",exact:["소니 WF-1000XM6","WF-1000XM6"],broad:["소니","sony","이어폰","1000xm"]},
   {id:"tt",exact:["스토케 트립트랩 체어","트립트랩 체어","tripp trapp"],broad:["스토케","stokke","트립트랩"]},
   {id:"onitsuka",exact:["오니츠카타이거 멕시코66","멕시코66","mexico 66"],broad:["오니츠카","onitsuka"]},
-  {id:"iphone17",exact:["아이폰 17 (256GB)","아이폰 17 256GB","iphone 17 256gb"],broad:["아이폰","iphone"]},
-  {id:"x100vi",exact:["후지필름 X100VI","X100VI"],broad:["후지필름","fujifilm","x100"]},
-  {id:"switch2",exact:["닌텐도 스위치2 (일본어 전용판)","스위치2 일본어 전용판"],broad:["스위치","switch"]},
-  {id:"kakubin",exact:["산토리 가쿠빈 700ml","가쿠빈 700ml"],broad:["가쿠빈","산토리","suntory"]},
+  {id:"iphone17",exact:["아이폰 17 (256GB)","아이폰 17 256GB","iphone 17 256gb"],broad:["아이폰","iphone","애플","apple"]},
+  {id:"x100vi",exact:["후지필름 X100VI","X100VI"],broad:["후지필름","후지","fujifilm","x100","카메라"]},
+  {id:"switch2",exact:["닌텐도 스위치2 (일본어 전용판)","스위치2 일본어 전용판"],broad:["닌텐도","nintendo","스위치","switch","게임기"]},
+  {id:"kakubin",exact:["산토리 가쿠빈 700ml","가쿠빈 700ml"],broad:["가쿠빈","산토리","suntory","위스키","whisky"]},
   {id:"whip",exact:["센카 퍼펙트휩 120g","퍼펙트휩 120g","퍼펙트 휩 120g","센카 퍼펙트 휩"],broad:["퍼펙트휩","퍼펙트 휩","센카"]},
   {id:"biore",exact:["비오레 UV 아쿠아리치 워터리 에센스 70g","아쿠아리치 워터리 에센스 70g","비오레 아쿠아리치 70g"],broad:["비오레","아쿠아리치"]},
   {id:"kyusoku",exact:["휴족시간 18매","휴족시간 18"],broad:["휴족시간","휴족"]},
@@ -1438,11 +1438,13 @@ function renderPrep(){
 /* ---------- 매장 계산기 ---------- */
 // 정확한 모델명일 때만 등록 가격을 씀. "맥북 프로"처럼 비슷하기만 하면 안내만 하고 가격은 넣지 않음
 function matchName(q){
-  const n = norm(q); if (!n) return {item:null, near:null};
+  const n = norm(q); if (!n) return {item:null, near:[]};
   const m = MATCH.find(x => x.exact.some(e => norm(e)===n) || norm(ITEMS.find(i=>i.id===x.id).name)===n);
-  if (m) return {item:ITEMS.find(i=>i.id===m.id), near:null};
-  const b = MATCH.find(x => x.broad.some(k => n.includes(norm(k))));
-  return {item:null, near: b ? ITEMS.find(i=>i.id===b.id) : null};
+  if (m) return {item:ITEMS.find(i=>i.id===m.id), near:[]};
+  // 브랜드·모델 일부만 쳐도 등록 상품을 최대 3개까지 추천 (예: "닌텐도" → 스위치2)
+  const ids = MATCH.filter(x => x.broad.some(k => n.includes(norm(k)))).map(x => x.id);
+  if (n.length >= 2) ITEMS.forEach(i => { if (!ids.includes(i.id) && (norm(i.name).includes(n) || norm(i.short).includes(n))) ids.push(i.id); });
+  return {item:null, near: ids.slice(0,3).map(id => ITEMS.find(i=>i.id===id))};
 }
 function readCalc(){
   const cat = $("c-cat").value;
@@ -1570,7 +1572,8 @@ function onName(){
     setText("c-match", catTouched ? "등록 안 된 상품" : g ? `등록 안 된 상품 · 종류 자동: ${KINDS[g].l}` : "등록 안 된 상품 · 종류는 상세 조건에서 골라 주세요");
     setText("c-kr-src", $("c-kr").value === "" ? "직접 확인해 넣어 주세요" : "직접 입력");
     const sg = $("c-suggest");
-    if (near){ sg.innerHTML = `등록 상품 중 비슷한 건 <b>${esc(near.name)}</b>이에요. 모델이 다르면 등록 가격을 쓰지 않으니 국내 판매가를 직접 넣어 주세요. <button class="btn btn-sm" type="button" data-act="pick" data-id="${near.id}">이 모델이 맞아요</button>`; sg.hidden = false; }
+    if (near.length === 1){ sg.innerHTML = `등록 상품 중 비슷한 건 <b>${esc(near[0].name)}</b>이에요. 모델이 다르면 등록 가격을 쓰지 않으니 국내 판매가를 직접 넣어 주세요. <button class="btn btn-sm" type="button" data-act="pick" data-id="${near[0].id}">이 모델이 맞아요</button>`; sg.hidden = false; }
+    else if (near.length){ sg.innerHTML = `등록 상품 중 비슷한 게 있어요. 같은 모델이면 골라 주세요. 다른 모델이면 국내 판매가를 직접 넣으면 돼요. <span class="sg-opts">${near.map(i => `<button class="btn btn-sm" type="button" data-act="pick" data-id="${i.id}">${esc(i.short)}</button>`).join("")}</span>`; sg.hidden = false; }
     else sg.hidden = true;
   }
 }
