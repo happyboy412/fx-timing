@@ -548,6 +548,19 @@ html[data-theme="retro"] .share-btns{display:flex;gap:8px;flex-wrap:wrap}
 @media (prefers-reduced-motion:reduce){html[data-theme="retro"] .gauge i,html[data-theme="retro"] .toast{transition:none}html[data-theme="retro"] .minibar.is-pulse{animation:none}}
 
 
+/* 상품 묶음 탭·바코드 (두 테마 공통) */
+.pick-wrap{display:flex;flex-direction:column;gap:10px}
+.pick-tabs{display:flex;gap:16px;border-bottom:1px solid var(--line)}
+.pick-tabs button{border:0;background:none;font:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:6px 0 10px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.pick-tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.calc-actions{display:flex;gap:6px}
+.scan{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#fff;font-size:15px}
+.scan video{width:min(92vw,480px);border-radius:16px;background:#000}
+.scan-box{position:absolute;width:min(70vw,320px);height:120px;border:3px solid #fff;border-radius:12px;top:50%;left:50%;transform:translate(-50%,-80%);pointer-events:none}
+.scan .btn{background:#fff;color:#191F28}
+html[data-theme="retro"] .pick-tabs button{font-family:var(--pixel)}
+html[data-theme="retro"] .pick-tabs{border-bottom:2px dashed var(--line)}
+html[data-theme="retro"] .pick-tabs button[aria-selected="true"]{border-bottom:3px solid var(--line)}
 /* 국내 최저가 후보 (두 테마 공통) */
 .kr-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .krlist{display:flex;flex-direction:column;gap:6px}
@@ -861,13 +874,13 @@ html[data-theme="retro"] .cardtable{border:2px solid var(--line);border-radius:0
     <div class="main">
       <div class="stack">
         <section class="panel calc stack" aria-labelledby="calc-title">
-          <div class="between"><h2 id="calc-title">이거, 한국보다 싸요?</h2><button class="btn btn-sm btn-ghost" type="button" id="c-reset">새로 계산</button></div>
+          <div class="between"><h2 id="calc-title">이거, 한국보다 싸요?</h2><span class="calc-actions"><button class="btn btn-sm btn-ghost" type="button" id="c-scan" hidden>바코드</button><button class="btn btn-sm btn-ghost" type="button" id="c-reset">새로 계산</button></span></div>
           <div class="grid2 calc-main">
             <label class="field span2">① 상품 <span class="hint" id="c-match"></span>
               <input id="c-name" type="text" autocomplete="off" list="c-names" value="소니 WH-1000XM6" placeholder="목록에서 정확한 모델을 고르세요">
               <datalist id="c-names"></datalist>
             </label>
-            <div class="picks span2" id="c-picks" role="group" aria-label="등록 상품 빠르게 고르기"></div>
+            <div class="span2 pick-wrap"><div class="pick-tabs" id="c-pick-tabs" role="tablist" aria-label="상품 묶음"></div><div class="picks" id="c-picks" role="group" aria-label="등록 상품 빠르게 고르기"></div></div>
             <label class="field">② 가격표 (엔) <span class="hint" id="c-yen-src"></span>
               <input id="c-yen" type="number" min="0" max="10000000" step="10" inputmode="numeric" value="59400">
             </label>
@@ -994,6 +1007,12 @@ html[data-theme="retro"] .cardtable{border:2px solid var(--line);border-radius:0
   <div><div class="muted small">국내가 대비</div><b id="mb-saved"></b></div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="scan" id="scan" hidden role="dialog" aria-label="바코드 스캔">
+  <video id="scan-v" playsinline muted></video>
+  <div class="scan-box" aria-hidden="true"></div>
+  <p>상품 바코드를 네모 안에 맞춰 주세요</p>
+  <button class="btn" type="button" id="scan-close">닫기</button>
+</div>
 <script>
 "use strict";
 /* ================= 규칙 데이터 (근거·검증일과 함께 관리) ================= */
@@ -1051,20 +1070,20 @@ const STORES = {
 };
 // 등록 상품: 가격의 성격·출처·확인 시점, 국내판과 다른 사양(spec)을 함께 기록
 const ITEMS = [
-  {id:"mba",short:"맥북 에어",name:"맥북 에어 13 (M5)",cat:"apple",yen:184800,kr:2190000,jpSrc:"애플 일본 공식가",krSrc:"애플 국내 출시가(보도)",checked:"2026.11",spec:"일본판은 일본어(JIS) 키보드일 수 있어요. 매장에서 US 배열 재고를 확인하세요."},
-  {id:"whxm6",short:"WH-1000XM6",name:"소니 WH-1000XM6",cat:"av",yen:59400,kr:619000,jpSrc:"소니스토어 공식가",krSrc:"국내 출시가(보도)",checked:"2026.11"},
-  {id:"wfxm6",short:"WF-1000XM6",name:"소니 WF-1000XM6",cat:"av",yen:44550,kr:499000,jpSrc:"소니 공식가(보도)",krSrc:"국내 출시가(보도)",checked:"2026.11"},
-  {id:"tt",short:"트립트랩",name:"스토케 트립트랩 체어",cat:"etc",yen:34980,kr:430000,jpSrc:"가격.com 최저가",krSrc:"국내 판매가(보도)",checked:"2026.11",note:"부피가 커서 위탁 수하물 규정을 확인하세요. 온라인 최저가라 매장 가격은 더 높을 수 있어요."},
-  {id:"onitsuka",short:"멕시코66",name:"오니츠카타이거 멕시코66",cat:"wear",yen:14300,kr:196000,jpSrc:"가격.com 최저가",krSrc:"가격 추적 사이트",checked:"2026.11",note:"사이즈·컬러별 가격이 달라요. 일본 매장 정가는 이보다 높을 수 있어요."},
-  {id:"iphone17",short:"아이폰 17",name:"아이폰 17 (256GB)",cat:"apple",yen:159800,kr:1287000,jpSrc:"애플 일본 공식가(인상 후)",krSrc:"애플 국내 출시가(보도)",checked:"2026.11",spec:"일본판은 카메라 셔터음을 끌 수 없어요."},
-  {id:"x100vi",short:"X100VI",name:"후지필름 X100VI",cat:"camera",yen:315700,kr:2399000,jpSrc:"일본 공식가(10월 인상 후, 보도)",krSrc:"국내 출시가(보도)",checked:"2026.11",note:"디지털카메라는 관세 0%라 한도를 넘으면 부가세 10%만 계산해요."},
-  {id:"switch2",short:"스위치2",name:"닌텐도 스위치2 (일본어 전용판)",cat:"game",yen:49980,kr:758000,jpSrc:"닌텐도 일본 공식가",krSrc:"국내 공식가(9/1 인상)",checked:"2026.11",spec:"일본어 전용판이라 한국어로 바꿀 수 없어요. 국내판과 같은 제품으로 보기 어려워요."},
-  {id:"whip",short:"퍼펙트휩",name:"센카 퍼펙트휩 120g",cat:"beauty",yen:547,kr:9800,jpSrc:"마츠키요 온라인 가격",krSrc:"국내 본사직영 판매가(SSG)",checked:"2026.11",note:"소액이라 같은 매장에서 다른 물건과 합쳐 세전 ¥5,000을 넘겨야 환급돼요."},
-  {id:"biore",short:"비오레 선크림",name:"비오레 UV 아쿠아리치 워터리 에센스 70g",cat:"beauty",yen:968,kr:11000,jpSrc:"마츠키요 온라인 가격",krSrc:"국내 직구 판매가(가격 추적)",checked:"2026.11",note:"국내 정식 판매는 50g 제품이라 70g은 직구가로 비교했어요."},
-  {id:"kyusoku",short:"휴족시간",name:"휴족시간 18매",cat:"etc",yen:1020,kr:0,jpSrc:"빅카메라 공식몰 가격",krSrc:"국내 정식 판매가 미확인",checked:"2026.11",note:"국내 가격을 등록하지 않았어요. 아래 금액보다 국내가 비싸면 일본이 이득이에요."},
-  {id:"roihi",short:"로이히츠보코",name:"로이히츠보코 156매",cat:"med",yen:581,kr:6500,jpSrc:"선드럭 온라인 가격",krSrc:"국내 직구 판매가(가격 추적)",checked:"2026.11",note:"일본 의약품(제3류)이에요. 의약품은 총 6병(넘으면 3개월 복용량)까지 들여올 수 있어요."},
-  {id:"evea",short:"이브A",name:"이브A정 60정",cat:"med",yen:1045,kr:0,jpSrc:"택스프리 온라인 3개 묶음가 기준 1개",krSrc:"국내 정식 판매 없음",checked:"2026.11",note:"국내 정식 판매가 없어 국내가를 등록하지 않았어요. 의약품은 총 6병(넘으면 3개월 복용량)까지예요."},
-  {id:"kakubin",short:"가쿠빈",name:"산토리 가쿠빈 700ml",cat:"liquor",ml:700,yen:2101,kr:47500,jpSrc:"일본 권장가(보도)",krSrc:"국내 판매가",checked:"2026.11",note:"술은 $800과 별도 한도(2L·$400)예요. 700ml는 3병(2.1L)부터 한도를 넘어요. 혼자 사면 세전 ¥5,000이 안 돼 환급도 안 돼요."}
+  {id:"mba",group:"elec",jan:"",short:"맥북 에어",name:"맥북 에어 13 (M5)",cat:"apple",yen:184800,kr:2190000,jpSrc:"애플 일본 공식가",krSrc:"애플 국내 출시가(보도)",checked:"2026.11",spec:"일본판은 일본어(JIS) 키보드일 수 있어요. 매장에서 US 배열 재고를 확인하세요."},
+  {id:"whxm6",group:"elec",jan:"",short:"WH-1000XM6",name:"소니 WH-1000XM6",cat:"av",yen:59400,kr:619000,jpSrc:"소니스토어 공식가",krSrc:"국내 출시가(보도)",checked:"2026.11"},
+  {id:"wfxm6",group:"elec",jan:"",short:"WF-1000XM6",name:"소니 WF-1000XM6",cat:"av",yen:44550,kr:499000,jpSrc:"소니 공식가(보도)",krSrc:"국내 출시가(보도)",checked:"2026.11"},
+  {id:"tt",group:"life",jan:"",short:"트립트랩",name:"스토케 트립트랩 체어",cat:"etc",yen:34980,kr:430000,jpSrc:"가격.com 최저가",krSrc:"국내 판매가(보도)",checked:"2026.11",note:"부피가 커서 위탁 수하물 규정을 확인하세요. 온라인 최저가라 매장 가격은 더 높을 수 있어요."},
+  {id:"onitsuka",group:"life",jan:"",short:"멕시코66",name:"오니츠카타이거 멕시코66",cat:"wear",yen:14300,kr:196000,jpSrc:"가격.com 최저가",krSrc:"가격 추적 사이트",checked:"2026.11",note:"사이즈·컬러별 가격이 달라요. 일본 매장 정가는 이보다 높을 수 있어요."},
+  {id:"iphone17",group:"elec",jan:"",short:"아이폰 17",name:"아이폰 17 (256GB)",cat:"apple",yen:159800,kr:1287000,jpSrc:"애플 일본 공식가(인상 후)",krSrc:"애플 국내 출시가(보도)",checked:"2026.11",spec:"일본판은 카메라 셔터음을 끌 수 없어요."},
+  {id:"x100vi",group:"elec",jan:"",short:"X100VI",name:"후지필름 X100VI",cat:"camera",yen:315700,kr:2399000,jpSrc:"일본 공식가(10월 인상 후, 보도)",krSrc:"국내 출시가(보도)",checked:"2026.11",note:"디지털카메라는 관세 0%라 한도를 넘으면 부가세 10%만 계산해요."},
+  {id:"switch2",group:"elec",jan:"",short:"스위치2",name:"닌텐도 스위치2 (일본어 전용판)",cat:"game",yen:49980,kr:758000,jpSrc:"닌텐도 일본 공식가",krSrc:"국내 공식가(9/1 인상)",checked:"2026.11",spec:"일본어 전용판이라 한국어로 바꿀 수 없어요. 국내판과 같은 제품으로 보기 어려워요."},
+  {id:"whip",group:"beauty",jan:"4550516474568",short:"퍼펙트휩",name:"센카 퍼펙트휩 120g",cat:"beauty",yen:547,kr:9800,jpSrc:"마츠키요 온라인 가격",krSrc:"국내 본사직영 판매가(SSG)",checked:"2026.11",note:"소액이라 같은 매장에서 다른 물건과 합쳐 세전 ¥5,000을 넘겨야 환급돼요."},
+  {id:"biore",group:"beauty",jan:"4901301447647",short:"비오레 선크림",name:"비오레 UV 아쿠아리치 워터리 에센스 70g",cat:"beauty",yen:968,kr:11000,jpSrc:"마츠키요 온라인 가격",krSrc:"국내 직구 판매가(가격 추적)",checked:"2026.11",note:"국내 정식 판매는 50g 제품이라 70g은 직구가로 비교했어요."},
+  {id:"kyusoku",group:"beauty",jan:"4903301138525",short:"휴족시간",name:"휴족시간 18매",cat:"etc",yen:1020,kr:0,jpSrc:"빅카메라 공식몰 가격",krSrc:"국내 정식 판매가 미확인",checked:"2026.11",note:"국내 가격을 등록하지 않았어요. 아래 금액보다 국내가 비싸면 일본이 이득이에요."},
+  {id:"roihi",group:"beauty",jan:"4987167007263",short:"로이히츠보코",name:"로이히츠보코 156매",cat:"med",yen:581,kr:6500,jpSrc:"선드럭 온라인 가격",krSrc:"국내 직구 판매가(가격 추적)",checked:"2026.11",note:"일본 의약품(제3류)이에요. 의약품은 총 6병(넘으면 3개월 복용량)까지 들여올 수 있어요."},
+  {id:"evea",group:"beauty",jan:"4987300028483",short:"이브A",name:"이브A정 60정",cat:"med",yen:1045,kr:0,jpSrc:"택스프리 온라인 3개 묶음가 기준 1개",krSrc:"국내 정식 판매 없음",checked:"2026.11",note:"국내 정식 판매가 없어 국내가를 등록하지 않았어요. 의약품은 총 6병(넘으면 3개월 복용량)까지예요."},
+  {id:"kakubin",group:"life",jan:"",short:"가쿠빈",name:"산토리 가쿠빈 700ml",cat:"liquor",ml:700,yen:2101,kr:47500,jpSrc:"일본 권장가(보도)",krSrc:"국내 판매가",checked:"2026.11",note:"술은 $800과 별도 한도(2L·$400)예요. 700ml는 3병(2.1L)부터 한도를 넘어요. 혼자 사면 세전 ¥5,000이 안 돼 환급도 안 돼요."}
 ];
 // 상품 매칭: exact가 정확히 같을 때만 가격을 씀. broad는 "혹시 이 상품?" 안내에만 쓰고 가격은 넣지 않음
 const MATCH = [
@@ -1083,6 +1102,45 @@ const MATCH = [
   {id:"roihi",exact:["로이히츠보코 156매","로이히 츠보코 156매","동전파스 156매"],broad:["로이히","동전파스","츠보코"]},
   {id:"evea",exact:["이브A정 60정","이브A 60정","이브 A정 60정"],broad:["이브","eve"]}
 ];
+const GROUPS = [["elec","전자기기"],["beauty","화장품·약"],["life","패션·생활·술"]];
+// 상품 이름으로 종류(세율·쿠폰 기준)를 추정. 먼저 맞는 규칙이 이겨요. 틀리면 상세 조건에서 바꾸면 돼요
+const KIND_RULES = [
+  ["liquor",["위스키","사케","소주","맥주","와인","하이볼","가쿠빈","산토리","닛카","히비키","야마자키","whisky","sake"]],
+  ["perfume",["향수","퍼퓸","오드뚜왈렛","오드퍼퓸","코롱","perfume"]],
+  ["apple",["아이폰","맥북","아이패드","에어팟","애플워치","iphone","macbook","ipad","airpods","apple"]],
+  ["game",["닌텐도","스위치","플스","플레이스테이션","ps5","게임기","nintendo","switch"]],
+  ["camera",["카메라","미러리스","인스탁스","체키","고프로","후지필름","x100","gopro","instax","camera"]],
+  ["pc",["노트북","태블릿","갤럭시탭","스마트폰","갤럭시","laptop","tablet"]],
+  ["watch",["시계","지샥","g-shock","세이코","시티즌","카시오","watch"]],
+  ["av",["헤드폰","이어폰","이어버드","스피커","드라이기","드라이어","다이슨","전동칫솔","면도기","고데기","밥솥","가전","블루투스","wh-","wf-","headphone","earbuds"]],
+  ["med",["진통제","위장약","소화제","안약","감기약","파스","영양제","비타민","유산균","카베진","이브a","로이히","오타이산","파브론","아리나민","의약품","약 "]],
+  ["snack",["과자","초콜릿","사탕","젤리","라면","킷캣","로이스","쿠키","녹차","말차","커피","후리카케","식품","간식"]],
+  ["beauty",["화장품","선크림","썬크림","클렌징","폼클렌징","스킨","로션","세럼","에센스","마스카라","립","쿠션","파운데이션","마스크팩","샴푸","트리트먼트","비오레","센카","키스미","캔메이크","멜라노","하다라보","시세이도","휴족시간","크림"]],
+  ["bag",["가방","백팩","지갑","파우치","토트","숄더백","포터","porter"]],
+  ["wear",["신발","운동화","스니커즈","티셔츠","셔츠","바지","자켓","재킷","코트","후드","니트","양말","의류","오니츠카","아식스","뉴발란스","나이키","꼼데","유니클로","sneakers"]]
+];
+function guessKind(name){
+  const n = " " + String(name).toLowerCase() + " ";
+  for (const [k,words] of KIND_RULES) if (words.some(w => n.includes(w))) return k;
+  return null;
+}
+// 네이버 쇼핑 분류 → 종류
+function kindFromCategory(cat){
+  const c = String(cat||"");
+  if (/주류|위스키|와인/.test(c)) return "liquor";
+  if (/향수/.test(c)) return "perfume";
+  if (/노트북|태블릿|휴대폰/.test(c)) return "pc";
+  if (/카메라/.test(c)) return "camera";
+  if (/게임기/.test(c)) return "game";
+  if (/시계/.test(c)) return "watch";
+  if (/디지털|가전/.test(c)) return "av";
+  if (/화장품|미용/.test(c)) return "beauty";
+  if (/의약|건강식품|영양제/.test(c)) return "med";
+  if (/식품/.test(c)) return "snack";
+  if (/가방|지갑/.test(c)) return "bag";
+  if (/패션|의류|신발/.test(c)) return "wear";
+  return null;
+}
 const norm = s => String(s).toLowerCase().replace(/[\s\-_()·.,/]/g, "");
 
 /* ================= 상태와 저장 ================= */
@@ -1287,7 +1345,7 @@ function optimizeSplit(p, r, declare){
 /* ================= 화면 갱신 =================
    입력칸이 있는 영역(장바구니)은 구조가 바뀔 때만 새로 만들고, 평소엔 숫자·클래스만 바꿔요.
    그래서 면세점 금액을 입력하는 도중에도 포커스와 커서가 그대로 있어요. */
-let fxStatus = "idle", couponTouched = false, krTouched = false, yenTouched = false, feeTouched = false, matchId = null, toastTimer = 0, structKey = "", pathsKey = "";
+let fxStatus = "idle", pickGroup = "elec", catTouched = false, couponTouched = false, krTouched = false, yenTouched = false, feeTouched = false, matchId = null, toastTimer = 0, structKey = "", pathsKey = "";
 const setText = (id,t) => { const el=$(id); if (el.textContent !== t) el.textContent = t; };
 const setHTML = (id,h) => { const el=$(id); if (el.innerHTML !== h) el.innerHTML = h; };
 const curPerson = () => clamp(S.person, 1, S.people);
@@ -1438,7 +1496,8 @@ function renderCalc(){
   const wl = walletOn() && cd.cover>0 ? `<br>지갑 엔화 ¥${fmt(cd.cover)}는 ${wr.toFixed(1)}원${cd.cover < cd.paid ? `, 나머지 ¥${fmt(cd.paid-cd.cover)}는 카드 결제로 보고 오늘 환율` : ""}로 계산했어요.` : "";
   const oth = Math.abs(e.others) >= 1 ? `<br>같이 사면 같은 매장 물건도 환급 조건(세전 ¥5,000)을 채워 ${won(-e.others)} 더 돌려받아요.` : "";
   const it = matchId ? ITEMS.find(i=>i.id===matchId) : null;
-  const spec = it && it.spec ? `<div class="spec">⚠ 사양 차이 있음 · ${esc(it.spec)}</div>` : "";
+  const spec = (it && it.spec ? `<div class="spec">⚠ 사양 차이 있음 · ${esc(it.spec)}</div>` : "")
+    + (it && /직구/.test(it.krSrc) && !krTouched && v.cls !== "is-check" ? `<div class="spec">⚠ 국내가가 직구 판매가라 실제 국내 최저가는 더 낮을 수 있어요. "국내 최저가 찾기"로 확인해 보세요.</div>` : "");
   const box = $("c-verdict"); box.className = "verdict " + v.cls;
   setHTML("c-verdict", `<div class="v">${esc(v.text)}</div><p class="d"><b>${esc(v.why)}</b><br>${tax}<br>국내 기준가 <b>${e.kr ? won(e.kr) : "미입력"}</b>${c.yen>0 && !e.sepOver ? ` · 손익분기 국내가 <b>${won(e.beat)}</b>` : ""}${oth}${wl}</p>${spec}`);
 
@@ -1484,7 +1543,12 @@ function renderCalc(){
 function onName(){
   const {item, near} = matchName($("c-name").value);
   const prev = matchId; matchId = item ? item.id : null;
+  if (item && item.group !== pickGroup){ pickGroup = item.group; renderPicks(); }
   $("c-picks").querySelectorAll(".pick").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.id === matchId)));
+  if (!item && !catTouched){
+    const g = guessKind($("c-name").value);
+    if (g && $("c-cat").value !== g){ $("c-cat").value = g; couponTouched = false; }
+  }
   if (item){
     if (item.id !== prev){ krTouched = false; couponTouched = false; }
     if (!krTouched) $("c-kr").value = item.kr > 0 ? item.kr : "";
@@ -1498,7 +1562,8 @@ function onName(){
     if (prev && !krTouched) $("c-kr").value = "";            // 다른 상품의 국내가·참고 엔화를 그대로 쓰지 않음
     if (prev && !yenTouched) $("c-yen").value = "";
     if (prev) setText("c-yen-src", "");
-    setText("c-match", "등록 안 된 상품");
+    const g = guessKind($("c-name").value);
+    setText("c-match", catTouched ? "등록 안 된 상품" : g ? `등록 안 된 상품 · 종류 자동: ${KINDS[g].l}` : "등록 안 된 상품 · 종류는 상세 조건에서 골라 주세요");
     setText("c-kr-src", $("c-kr").value === "" ? "직접 확인해 넣어 주세요" : "직접 입력");
     const sg = $("c-suggest");
     if (near){ sg.innerHTML = `등록 상품 중 비슷한 건 <b>${esc(near.name)}</b>이에요. 모델이 다르면 등록 가격을 쓰지 않으니 국내 판매가를 직접 넣어 주세요. <button class="btn btn-sm" type="button" data-act="pick" data-id="${near.id}">이 모델이 맞아요</button>`; sg.hidden = false; }
@@ -1728,7 +1793,7 @@ async function findKR(auto){
     if (seq !== krSeq) return;
     const d = await res.json(); const items = (d.items||[]).filter(i => i.price > 0).slice(0,5);
     if (!items.length){ setText("c-krstate", "검색 결과가 없어요. 직접 넣어 주세요."); $("c-krlist").hidden = true; return; }
-    $("c-krlist").innerHTML = items.map((i,k) => `<button class="kr-opt" type="button" data-k="${k}" data-price="${i.price}" data-mall="${esc(i.mall||"")}"><span>${esc(i.title)}</span><b>${won(i.price)}</b><span class="m">${esc(i.mall||"")} · 네이버 쇼핑</span></button>`).join("");
+    $("c-krlist").innerHTML = items.map((i,k) => `<button class="kr-opt" type="button" data-k="${k}" data-price="${i.price}" data-mall="${esc(i.mall||"")}" data-cat="${esc(i.category||"")}"><span>${esc(i.title)}</span><b>${won(i.price)}</b><span class="m">${esc(i.mall||"")} · 네이버 쇼핑</span></button>`).join("");
     $("c-krlist").hidden = false;
     setText("c-krstate", "같은 모델·용량인지 확인하고 골라 주세요.");
     track("kr-search");
@@ -1799,9 +1864,35 @@ function applyTheme(t){
   $("theme-btn").textContent = t === "retro" ? "기본 테마로 보기" : "레트로 테마";
   save();
 }
+function renderPicks(){
+  $("c-pick-tabs").innerHTML = GROUPS.map(([k,l]) => `<button type="button" role="tab" data-g="${k}" aria-selected="${k===pickGroup}">${l}</button>`).join("");
+  $("c-picks").innerHTML = ITEMS.filter(i => i.group === pickGroup).map(i => `<button class="pick" type="button" data-id="${i.id}" aria-pressed="${i.id===matchId}">${esc(i.short)}</button>`).join("");
+}
+/* ---------- 바코드 (안드로이드 크롬 등 BarcodeDetector 지원 브라우저) ---------- */
+let scanStream = null, scanTimer = 0;
+function scanLookup(code){
+  const it = ITEMS.find(i => i.jan && i.jan === String(code));
+  if (it){ $("c-name").value = it.name; krTouched = false; yenTouched = false; onName(); renderCalc(); toast(`바코드로 ‘${it.name}’을 찾았어요.`); track("scan-hit"); return true; }
+  toast(`등록 안 된 바코드예요 (${code}). 상품 이름을 입력해 주세요.`); track("scan-miss"); $("c-name").focus(); return false;
+}
+async function openScan(){
+  try{
+    const det = new BarcodeDetector({formats:["ean_13","ean_8"]});
+    scanStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}});
+    const v = $("scan-v"); v.srcObject = scanStream; await v.play(); $("scan").hidden = false;
+    const tick = async () => {
+      if ($("scan").hidden) return;
+      try{ const r = await det.detect(v); if (r && r.length){ closeScan(); scanLookup(r[0].rawValue); return; } }catch(e){}
+      scanTimer = setTimeout(tick, 300);
+    };
+    tick();
+  }catch(e){ closeScan(); toast("카메라를 열 수 없어요. 브라우저의 카메라 권한을 확인해 주세요."); }
+}
+function closeScan(){ clearTimeout(scanTimer); $("scan").hidden = true; if (scanStream){ scanStream.getTracks().forEach(t => t.stop()); scanStream = null; } }
+
 function resetCalc(){
   $("c-name").value = ""; $("c-yen").value = ""; $("c-kr").value = ""; $("c-qty").value = 1;
-  krTouched = false; yenTouched = false; couponTouched = false; matchId = null;
+  krTouched = false; yenTouched = false; couponTouched = false; catTouched = false; matchId = null;
   onName(); setText("c-match", ""); setText("c-kr-src", ""); setText("c-msg", "");
   renderCalc(); $("c-name").focus();
 }
@@ -1816,7 +1907,8 @@ function init(){
   $("w-yen").value = S.wallet.yen || ""; $("w-krw").value = S.wallet.krw || "";
   $("declare").checked = S.declare;
   $("usd").value = S.usd;
-  $("c-picks").innerHTML = ITEMS.map(i => `<button class="pick" type="button" data-id="${i.id}" aria-pressed="false">${esc(i.short)}</button>`).join("");
+  renderPicks();
+  $("c-scan").hidden = !("BarcodeDetector" in window && navigator.mediaDevices);
   applyTheme(S.theme);
   fillPersonSelect(); buildItems(); applyStoreDefaults(); onName();
 
@@ -1831,6 +1923,9 @@ function init(){
   $("fx-refresh").addEventListener("click", () => fetchFx(true));
   $("theme-btn").addEventListener("click", () => applyTheme(S.theme === "retro" ? "modern" : "retro"));
   $("c-reset").addEventListener("click", resetCalc);
+  $("c-pick-tabs").addEventListener("click", e => { const b = e.target.closest("[data-g]"); if (b){ pickGroup = b.dataset.g; renderPicks(); } });
+  $("c-scan").addEventListener("click", openScan);
+  $("scan-close").addEventListener("click", closeScan);
   $("c-picks").addEventListener("click", e => {
     const b = e.target.closest(".pick"); if (!b) return;
     $("c-name").value = ITEMS.find(i => i.id === b.dataset.id).name; krTouched = false; yenTouched = false; setText("c-msg", "");
@@ -1881,12 +1976,13 @@ function init(){
   $("c-krlist").addEventListener("click", e => {
     const b = e.target.closest(".kr-opt"); if (!b) return;
     $("c-kr").value = b.dataset.price; krTouched = true;
+    if (!matchId && !catTouched){ const g = kindFromCategory(b.dataset.cat); if (g){ $("c-cat").value = g; couponTouched = false; } }
     const t = new Date(); setText("c-kr-src", `네이버 최저가 · ${b.dataset.mall} · ${t.getMonth()+1}/${t.getDate()} ${String(t.getHours()).padStart(2,"0")}:${String(t.getMinutes()).padStart(2,"0")} 확인`);
     $("c-krlist").hidden = true; setText("c-krstate", ""); renderCalc();
   });
   $("c-store").addEventListener("change", () => { couponTouched = false; feeTouched = false; applyStoreDefaults(); renderCalc(); });
   $("c-cat").addEventListener("change", () => {
-    couponTouched = false; const sep = TAX[KINDS[$("c-cat").value].tax].sep;
+    couponTouched = false; catTouched = true; const sep = TAX[KINDS[$("c-cat").value].tax].sep;
     if (sep==="perfume" && readNum("c-ml",0,5000,0) > 200) $("c-ml").value = 50;
     if (sep==="liquor" && readNum("c-ml",0,5000,0) < 100) $("c-ml").value = 700;
     renderCalc();
